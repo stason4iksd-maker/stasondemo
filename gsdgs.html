@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Minecraft King's Brawl | Dark Debug Mode</title>
+    <!-- PeerJS для P2P мультиплеера -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0c0a;
+            font-family: 'Courier New', 'Minecraft', 'Segoe UI', monospace;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(rgba(30, 40, 20, 0.6) 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        /* Тёмная тема с текстурой камня */
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            background: #1e1f1c;
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            border: 1px solid #4a3f2c;
+        }
+
+        /* Панель логов и отладки */
+        .debug-panel {
+            background: #0b0e0a;
+            border: 1px solid #5e5a3c;
+            border-radius: 20px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #aaf0c0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-family: monospace;
+            text-shadow: 0 0 2px #2e6b2e;
+        }
+
+        .debug-badge {
+            background: #2c2f1f;
+            padding: 4px 12px;
+            border-radius: 40px;
+            letter-spacing: 1px;
+            color: #ffd966;
+        }
+
+        .log-area {
+            background: #030504c9;
+            border-radius: 16px;
+            padding: 8px 12px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: monospace;
+            width: 60%;
+            backdrop-filter: blur(2px);
+        }
+
+        .log-entry {
+            border-left: 3px solid #6a9c3e;
+            padding-left: 8px;
+            margin: 4px 0;
+            color: #cfe8cf;
+        }
+
+        /* Меню / Лобби */
+        .lobby-screen, .pick-screen, .placement-screen, .battle-screen {
+            transition: all 0.2s;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .hero-card {
+            background: #2d2b21;
+            border-radius: 20px;
+            width: 170px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #6b5a3a;
+            transition: 0.1s linear;
+            box-shadow: 0 6px 0 #19170e;
+        }
+
+        .hero-card.selected {
+            border: 3px solid #f5c542;
+            background: #3e3a2a;
+            transform: scale(0.98);
+            box-shadow: 0 2px 0 #19170e;
+        }
+
+        .hero-card img {
+            width: 90px;
+            height: 90px;
+            image-rendering: pixelated;
+            background: #1e1b12;
+            border-radius: 50%;
+            padding: 5px;
+        }
+
+        .hero-name {
+            font-weight: bold;
+            color: #f0e6a0;
+            margin: 8px 0 4px;
+        }
+
+        .hero-desc {
+            font-size: 11px;
+            color: #bbb082;
+        }
+
+        button {
+            background: #3f3a2a;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #f9f2cf;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.07s linear;
+            box-shadow: 0 4px 0 #1e1b0e;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1e1b0e;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            background: #2b2a20;
+            padding: 20px;
+            border-radius: 28px;
+            margin: 15px 0;
+        }
+
+        .cell {
+            aspect-ratio: 5 / 4;
+            background: #3d3a2a;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #f2e1a0;
+            border: 2px solid #6a5e3a;
+            transition: 0.05s linear;
+            cursor: pointer;
+            text-shadow: 0 0 3px black;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .cell.owner-0 { background: #2f6b2f; border-color: #9ed96e; }
+        .cell.owner-1 { background: #8b3c2a; border-color: #e69d6e; }
+        .cell.selected-unit { box-shadow: 0 0 0 3px #ffcc44, inset 0 0 0 2px #ffdd77; }
+
+        .unit-icon {
+            font-size: 28px;
+            filter: drop-shadow(2px 2px 0 #1f1a0a);
+        }
+
+        .hp-bar {
+            font-size: 11px;
+            background: #1a1410aa;
+            padding: 2px 8px;
+            border-radius: 40px;
+            margin-top: 4px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .skill-btn {
+            background: #2d2b1a;
+            padding: 12px 24px;
+            font-size: 18px;
+            min-width: 140px;
+        }
+
+        .king-panel {
+            background: #181e12;
+            border-radius: 32px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status-tip {
+            background: #00000099;
+            border-radius: 12px;
+            padding: 4px 12px;
+        }
+
+        .turn-indicator {
+            background: #7a6a3a;
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 40px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; text-shadow: 0 0 4px gold; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameRoot"></div>
+
+<script>
+    // ------------------- АРХЕТИПЫ -------------------
+    const ARCHETYPES = {
+        redstone: { name: "Редстоун", img: "https://cdn.discordapp.com/attachments/123456789/redstone.png?width=80", hp: 24, attack: 7, skillQ: "Энергоблок", skillE: "Перегрузка" },
+        stone: { name: "Камень", img: "https://cdn.discordapp.com/attachments/123456789/stone.png?width=80", hp: 32, attack: 5, skillQ: "Сейсмический удар", skillE: "Окаменение" },
+        book: { name: "Книжный", img: "https://cdn.discordapp.com/attachments/123456789/book.png?width=80", hp: 22, attack: 6, skillQ: "Лечение свитком", skillE: "Знание-кара" },
+        headphones: { name: "Наушники", img: "https://cdn.discordapp.com/attachments/123456789/headphones.png?width=80", hp: 26, attack: 6, skillQ: "Звуковой удар", skillE: "Бафф ритма" },
+        darkness: { name: "Тьма", img: "https://cdn.discordapp.com/attachments/123456789/darkness.png?width=80", hp: 28, attack: 6, skillQ: "Теневой укус", skillE: "Восстановление тьмы" }
+    };
+    // реальные картинки (рабочие замены)
+    ARCHETYPES.redstone.img = "https://cdn-icons-png.flaticon.com/512/3448/3448586.png";
+    ARCHETYPES.stone.img = "https://cdn-icons-png.flaticon.com/512/1670/1670906.png";
+    ARCHETYPES.book.img = "https://cdn-icons-png.flaticon.com/512/2232/2232688.png";
+    ARCHETYPES.headphones.img = "https://cdn-icons-png.flaticon.com/512/2645/2645890.png";
+    ARCHETYPES.darkness.img = "https://cdn-icons-png.flaticon.com/512/3665/3665204.png";
+
+    // Королевские пассивки
+    const KING_PASSIVES = {
+        redstone: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки всем редстоун бойцам" },
+        stone: { bonusAtk: 0, bonusHp: 6, regen: 0, desc: "+6 HP камням" },
+        book: { bonusAtk: 1, bonusHp: 3, regen: 0, desc: "+1 атака +3 HP книжным" },
+        headphones: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки наушникам" },
+        darkness: { bonusAtk: 0, bonusHp: 2, regen: 1, desc: "Реген +1 в начале хода бойцам тьмы" }
+    };
+
+    // Глобальное состояние
+    let gameState = {
+        phase: "lobby", // lobby, pickCards, placement, battle
+        myPeerId: null,
+        peerConn: null,
+        roomId: null,
+        isHost: false,
+        myName: "",
+        opponentName: "оппонент",
+        myKing: null,    // { archetype, hp, maxHp, bonusAtk, bonusHp }
+        myFighters: [],  // массив объектов Unit
+        opponentKing: null,
+        opponentFighters: [],
+        myReady: false,
+        opponentReady: false,
+        placementReady: false,
+        opponentPlacementReady: false,
+        placementMap: Array(5).fill().map(() => Array(5).fill(null)), // { unit, owner }
+        opponentPlacementMap: null,
+        currentTurn: "player", // player / opponent
+        battleActive: false,
+        battleUnits: { playerUnits: [], opponentUnits: [], playerKing: null, opponentKing: null },
+        selectedCellPos: null, // {x,y} для атаки/способностей
+        stunnedUnits: [], // { id, turnsLeft }
+        debugMode: true
+    };
+
+    // Вспомогательные функции
+    function addLog(msg, isError = false) {
+        const logDiv = document.getElementById("debugLog");
+        if (logDiv) {
+            const entry = document.createElement("div");
+            entry.className = "log-entry";
+            entry.style.color = isError ? "#ffaa88" : "#c8e7b5";
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logDiv.appendChild(entry);
+            entry.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        if (gameState.debugMode) console.log("[DEBUG]", msg);
+    }
+
+    class Unit {
+        constructor(archetype, owner, index, kingBonus = { bonusAtk:0, bonusHp:0, regen:0 }) {
+            this.id = `${owner}_${archetype}_${index}_${Date.now()}_${Math.random()}`;
+            this.archetype = archetype;
+            this.owner = owner; // "player" or "opponent"
+            this.baseHp = ARCHETYPES[archetype].hp + (kingBonus.bonusHp || 0);
+            this.hp = this.baseHp;
+            this.baseAttack = ARCHETYPES[archetype].attack + (kingBonus.bonusAtk || 0);
+            this.attack = this.baseAttack;
+            this.regenBonus = kingBonus.regen || 0;
+            this.stunned = false;
+            this.alive = true;
+        }
+        takeDamage(amount) { this.hp = Math.max(0, this.hp - amount); if(this.hp<=0) this.alive=false; }
+        heal(amount) { this.hp = Math.min(this.baseHp, this.hp+amount); }
+        applyStun() { this.stunned = true; }
+        clearStun() { this.stunned = false; }
+    }
+
+    // отрисовка всей игры (рендер по состоянию)
+    function renderUI() {
+        const root = document.getElementById("gameRoot");
+        if (!root) return;
+        if (gameState.phase === "lobby") renderLobby(root);
+        else if (gameState.phase === "pickCards") renderPickCards(root);
+        else if (gameState.phase === "placement") renderPlacement(root);
+        else if (gameState.phase === "battle") renderBattle(root);
+    }
+
+    function renderLobby(root) {
+        root.innerHTML = `
+            <div style="text-align:center; padding:20px;">
+                <h1 style="color:#d7c87e;">⚔️ MINECRAFT KING'S BRAWL ⚔️</h1>
+                <div class="debug-panel"><span class="debug-badge">🐞 РЕЖИМ ОТЛАДКИ АКТИВЕН</span><span>PeerJS P2P | Тёмный фон</span></div>
+                <input type="text" id="nickInput" placeholder="Ваш ник" style="padding:12px;width:200px;margin:10px;border-radius:30px;background:#2f2b1c;color:white;border:none;">
+                <br>
+                <button id="createRoomBtn">🎮 СОЗДАТЬ КОМНАТУ</button>
+                <div style="margin:15px;"><input type="text" id="connectIdInput" placeholder="ID комнаты" style="padding:8px;"><button id="connectBtn">🔌 ПОДКЛЮЧИТЬСЯ</button></div>
+                <div id="lobbyStatus" style="color:#bbaa66"></div>
+            </div>
+        `;
+        document.getElementById("createRoomBtn")?.addEventListener("click", createRoom);
+        document.getElementById("connectBtn")?.addEventListener("click", connectToRoom);
+    }
+
+    async function createRoom() {
+        const nick = document.getElementById("nickInput").value.trim() || "Воин";
+        gameState.myName = nick;
+        const peer = new Peer();
+        peer.on("open", id => {
+            gameState.myPeerId = id;
+            gameState.isHost = true;
+            gameState.roomId = id;
+            addLog(`Комната создана: ${id}`);
+            document.getElementById("lobbyStatus").innerText = `Ваш ID комнаты: ${id} | Ожидаем противника...`;
+            gameState.peerConn = peer;
+            peer.on("connection", conn => {
+                addLog("Противник подключился!");
+                setupConnection(conn);
+            });
+        });
+        peer.on("error", err => addLog(`Ошибка Peer: ${err}`, true));
+    }
+
+    function connectToRoom() {
+        const roomId = document.getElementById("connectIdInput").value.trim();
+        const nick = document.getElementById("nickInput").value.trim() || "Игрок";
+        if(!roomId) return;
+        gameState.myName = nick;
+        const peer = new Peer();
+        peer.on("open", id => {
+            gameState.myPeerId = id;
+            const conn = peer.connect(roomId);
+            setupConnection(conn);
+        });
+        peer.on("error", e => addLog("Ошибка подключения", true));
+    }
+
+    function setupConnection(conn) {
+        gameState.peerConn = conn;
+        conn.on("open", () => {
+            addLog("Соединение установлено. Переход к выбору карт.");
+            gameState.phase = "pickCards";
+            sendGameState({ type: "init", myName: gameState.myName });
+            renderUI();
+        });
+        conn.on("data", handlePeerData);
+    }
+
+    function handlePeerData(data) {
+        if(data.type === "init") {
+            gameState.opponentName = data.myName;
+            addLog(`Противник: ${gameState.opponentName} готов к выбору`);
+            if(gameState.phase === "lobby") gameState.phase = "pickCards";
+            renderUI();
+        }
+        else if(data.type === "readyPick") {
+            gameState.opponentReady = true;
+            addLog("Противник выбрал карты");
+            if(gameState.myReady && gameState.opponentReady) startPlacementPhase();
+        }
+        else if(data.type === "placementData") {
+            gameState.opponentPlacementMap = data.map;
+            gameState.opponentPlacementReady = true;
+            if(gameState.placementReady && gameState.opponentPlacementReady) startBattle();
+        }
+        else if(data.type === "gameAction") {
+            applyRemoteAction(data.action);
+        }
+        else if(data.type === "syncFullState") {
+            // синхронизация боя
+            gameState.battleUnits = data.battleUnits;
+            gameState.currentTurn = data.currentTurn;
+            gameState.stunnedUnits = data.stunnedUnits || [];
+            renderUI();
+        }
+    }
+
+    function sendGameState(msg) { if(gameState.peerConn && gameState.peerConn.open) gameState.peerConn.send(msg); }
+
+    // ---------- ВЫБОР КАРТ ----------
+    function renderPickCards(root) {
+        let kingSelected = gameState.myKing;
+        let fightersSelected = gameState.myFighters.length;
+        root.innerHTML = `<div style="padding:20px"><h2>👑 Выберите КОРОЛЯ (пассивка)</h2><div class="card-grid" id="kingGrid"></div>
+        <h2>⚔️ Выберите 3 БОЙЦОВ</h2><div class="card-grid" id="fighterGrid"></div>
+        <div style="margin-top:20px"><button id="readyPickBtn">✅ ГОТОВ (${fightersSelected}/3) ${kingSelected ? "король выбран" : "нет короля"}</button></div>
+        <div class="debug-panel"><span>Ваш ник: ${gameState.myName}</span><span>Противник: ${gameState.opponentName || "ожидание"}</span></div>
+        </div>`;
+        const kingDiv = document.getElementById("kingGrid");
+        Object.keys(ARCHETYPES).forEach(arch => {
+            const card = createCard(arch, true);
+            card.onclick = () => {
+                gameState.myKing = { archetype: arch, ...KING_PASSIVES[arch] };
+                renderPickCards(root);
+            };
+            if(gameState.myKing?.archetype === arch) card.classList.add("selected");
+            kingDiv.appendChild(card);
+        });
+        const fighterDiv = document.getElementById("fighterGrid");
+        Object.keys(ARCHETYPES).forEach(arch => {
+            const card = createCard(arch, false);
+            card.onclick = () => {
+                if(gameState.myFighters.length < 3 && !gameState.myFighters.some(f=>f.archetype===arch)) {
+                    const kingBonus = gameState.myKing ? KING_PASSIVES[gameState.myKing.archetype] : {bonusAtk:0,bonusHp:0,regen:0};
+                    let bonus = { bonusAtk:0,bonusHp:0,regen:0 };
+                    if(gameState.myKing && gameState.myKing.archetype === arch) {
+                        bonus.bonusAtk = KING_PASSIVES[arch].bonusAtk || 0;
+                        bonus.bonusHp = KING_PASSIVES[arch].bonusHp || 0;
+                        bonus.regen = KING_PASSIVES[arch].regen || 0;
+                    }
+                    const unit = new Unit(arch, "player", gameState.myFighters.length, bonus);
+                    gameState.myFighters.push(unit);
+                } else alert("Максимум 3 разных бойца");
+                renderPickCards(root);
+            };
+            if(gameState.myFighters.some(f=>f.archetype===arch)) card.classList.add("selected");
+            fighterDiv.appendChild(card);
+        });
+        document.getElementById("readyPickBtn")?.addEventListener("click", () => {
+            if(!gameState.myKing || gameState.myFighters.length !== 3) { alert("Выберите короля и ровно 3 бойцов!"); return; }
+            gameState.myReady = true;
+            sendGameState({ type: "readyPick" });
+            addLog("Вы готовы, ожидаем противника");
+            if(gameState.opponentReady) startPlacementPhase();
+        });
+    }
+
+    function createCard(arch, isKing) {
+        const div = document.createElement("div"); div.className = "hero-card";
+        div.innerHTML = `<img src="${ARCHETYPES[arch].img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1670/1670906.png'"><div class="hero-name">${ARCHETYPES[arch].name}</div>
+        <div class="hero-desc">❤️ ${ARCHETYPES[arch].hp} ⚔️ ${ARCHETYPES[arch].attack}<br>${isKing ? "👑 Пассивка: "+KING_PASSIVES[arch].desc : "🎯 Q/E способности"}</div>`;
+        return div;
+    }
+
+    function startPlacementPhase() {
+        gameState.phase = "placement";
+        gameState.placementMap = Array(5).fill().map(()=>Array(5).fill(null));
+        gameState.placementReady = false;
+        gameState.opponentPlacementReady = false;
+        renderUI();
+    }
+
+    function renderPlacement(root) {
+        let gridHtml = `<div class="field-grid" id="placementGrid">`;
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++) {
+            let unitHere = gameState.placementMap[i][j];
+            gridHtml += `<div class="cell owner-0" data-x="${i}" data-y="${j}">${unitHere ? `🧙 ${unitHere.archetype}` : "⬚"}</div>`;
+        }
+        gridHtml += `</div><p>Разместите 3 бойцов на поле (клик по клетке)</p><button id="placementDoneBtn">🏁 ГОТОВО</button>`;
+        root.innerHTML = `<div style="padding:20px"><h2>Расстановка отряда</h2>${gridHtml}<div class="debug-panel">Противник расстановка: ${gameState.opponentPlacementReady ? "✅" : "⏳"}</div></div>`;
+        const cells = document.querySelectorAll("#placementGrid .cell");
+        cells.forEach(cell => {
+            cell.addEventListener("click", (e) => {
+                let x = parseInt(cell.dataset.x), y = parseInt(cell.dataset.y);
+                if(gameState.placementMap[x][y]) return;
+                let remaining = 3 - gameState.myFighters.filter(f => f.alive !== false).length;
+                let placed = gameState.placementMap.flat().filter(c=>c).length;
+                if(placed >= 3) return alert("Уже расставлены все 3");
+                let fighterToPlace = gameState.myFighters[placed];
+                if(fighterToPlace) gameState.placementMap[x][y] = fighterToPlace;
+                renderPlacement(root);
+            });
+        });
+        document.getElementById("placementDoneBtn")?.addEventListener("click", () => {
+            let placed = gameState.placementMap.flat().filter(c=>c).length;
+            if(placed !== 3) return alert("Разместите ровно 3 бойцов");
+            gameState.placementReady = true;
+            sendGameState({ type: "placementData", map: gameState.placementMap });
+            if(gameState.opponentPlacementReady) startBattle();
+        });
+    }
+
+    function startBattle() {
+        // формируем юнитов
+        let playerUnits = gameState.placementMap.flat().filter(u=>u);
+        let opponentUnitsRaw = gameState.opponentPlacementMap.flat().filter(u=>u);
+        let opponentUnits = opponentUnitsRaw.map(u=> {
+            let nu = new Unit(u.archetype, "opponent", 0, {bonusAtk:0,bonusHp:0,regen:0});
+            nu.hp = u.hp; nu.baseHp = u.baseHp; nu.attack = u.attack; return nu;
+        });
+        let playerKingUnit = new Unit(gameState.myKing.archetype, "player", 0, {});
+        playerKingUnit.hp = 40; playerKingUnit.baseHp = 40; playerKingUnit.attack = 0;
+        let oppKing = new Unit("king", "opponent",0,{}); oppKing.hp=40; oppKing.baseHp=40;
+        gameState.battleUnits = { playerUnits, opponentUnits, playerKing: playerKingUnit, opponentKing: oppKing };
+        gameState.currentTurn = "player";
+        gameState.stunnedUnits = [];
+        gameState.phase = "battle";
+        renderUI();
+    }
+
+    function renderBattle(root) {
+        let turnText = gameState.currentTurn === "player" ? "🔵 ВАШ ХОД" : "🔴 ХОД СОПЕРНИКА";
+        let grid = `<div class="field-grid">`;
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++) {
+            let unit = gameState.battleUnits.playerUnits.find((_,idx)=> gameState.placementMap[i]?.[j] === gameState.myFighters[idx]);
+            let oppUnit = gameState.battleUnits.opponentUnits.find((_,idx)=> gameState.opponentPlacementMap?.[i]?.[j] === gameState.opponentPlacementMap?.flat().filter(u=>u)[idx]);
+            let content = "";
+            let owner = "";
+            if(unit && unit.alive) { content = `${unit.archetype}❤️${unit.hp}`; owner = "player"; }
+            else if(oppUnit && oppUnit.alive) { content = `${oppUnit.archetype}❤️${oppUnit.hp}`; owner = "opponent"; }
+            else content = "⬚";
+            let cls = `cell owner-${owner === "player" ? 0 : 1}`;
+            if(gameState.selectedCellPos && gameState.selectedCellPos.x === i && gameState.selectedCellPos.y === j) cls+=" selected-unit";
+            grid += `<div class="${cls}" data-x="${i}" data-y="${j}">${content}</div>`;
+        }
+        grid += `</div>`;
+        let actionBar = "";
+        if(gameState.currentTurn === "player" && gameState.selectedCellPos) {
+            actionBar = `<div class="action-bar"><button id="attackBtn">⚔️ АТАКА</button><button id="skillQBtn" class="skill-btn">🔮 Q: способность 1</button><button id="skillEBtn" class="skill-btn">🎧 E: способность 2</button><button id="endTurnBtn">⏭️ ЗАВЕРШИТЬ ХОД</button></div>`;
+        } else if(gameState.currentTurn === "player") {
+            actionBar = `<div class="action-bar"><button id="endTurnBtn">⏭️ Завершить ход без атаки</button></div>`;
+        }
+        let kingPanel = `<div class="king-panel"><span>👑 Ваш Король: ❤️ ${gameState.battleUnits.playerKing.hp}</span><span>👑 Противник: ❤️ ${gameState.battleUnits.opponentKing.hp}</span></div>`;
+        root.innerHTML = `<div style="padding:10px"><div class="turn-indicator">${turnText}</div>${kingPanel}${grid}${actionBar}<div id="battleLog" class="log-area" style="margin-top:20px"><div id="debugLog"></div></div></div>`;
+        attachBattleEvents();
+        addLog("Битва началась!");
+    }
+
+    function attachBattleEvents() {
+        document.querySelectorAll(".cell").forEach(cell => {
+            cell.addEventListener("click", (e) => {
+                if(gameState.currentTurn !== "player") return;
+                let x = parseInt(cell.dataset.x), y = parseInt(cell.dataset.y);
+                let targetUnit = getUnitAt(x,y);
+                if(targetUnit && targetUnit.owner === "player") gameState.selectedCellPos = {x,y};
+                else if(targetUnit && targetUnit.owner === "opponent" && gameState.selectedCellPos) {
+                    performAttackOrAbility("attack", targetUnit);
+                } else if(!targetUnit) gameState.selectedCellPos = null;
+                renderBattle();
+            });
+        });
+        document.getElementById("attackBtn")?.addEventListener("click", ()=> {
+            if(!gameState.selectedCellPos) return;
+            let attacker = getUnitAt(gameState.selectedCellPos.x, gameState.selectedCellPos.y);
+            if(!attacker || attacker.owner !== "player" || attacker.stunned) { addLog("Юнит оглушён или не ваш"); return; }
+            let target = getSelectedEnemy();
+            if(target) performAttackOrAbility("attack", target);
+        });
+        document.getElementById("skillQBtn")?.addEventListener("click", ()=> useSkill("Q"));
+        document.getElementById("skillEBtn")?.addEventListener("click", ()=> useSkill("E"));
+        document.getElementById("endTurnBtn")?.addEventListener("click", ()=> endTurn());
+    }
+
+    function useSkill(slot) {
+        let attacker = getUnitAt(gameState.selectedCellPos?.x, gameState.selectedCellPos?.y);
+        if(!attacker || attacker.owner !== "player" || attacker.stunned) { addLog("Нельзя использовать способность"); return; }
+        let target = getSelectedEnemy();
+        if(!target) { addLog("Выберите врага (клик по клетке врага) перед использованием"); return; }
+        let chance = 0.75;
+        let hit = Math.random() < chance;
+        let arch = attacker.archetype;
+        let effects = "";
+        if(!hit) { addLog(`❌ ПРОМАХ! ${ARCHETYPES[arch].name} промахнулся способностью ${slot}`); return; }
+        if(slot === "Q") {
+            if(arch === "redstone") { target.takeDamage(7); effects="урон 7"; }
+            else if(arch === "stone") { target.applyStun(); effects="оглушение"; }
+            else if(arch === "book") { attacker.heal(6); effects="лечение +6 себе"; }
+            else if(arch === "headphones") { target.takeDamage(5); attacker.attack += 1; effects="урон 5 + атака +1"; }
+            else if(arch === "darkness") { target.takeDamage(5); attacker.heal(2); effects="урон 5, лечение 2"; }
+        } else {
+            if(arch === "redstone") { attacker.attack += 2; effects="+2 атаки навсегда"; }
+            else if(arch === "stone") { attacker.heal(8); effects="лечение 8 HP"; }
+            else if(arch === "book") { target.takeDamage(9); effects="мощный урон 9"; }
+            else if(arch === "headphones") { let buf = Math.random()<0.5; if(buf) attacker.attack+=2; effects= buf ? "+2 атаки" : "ничего"; }
+            else if(arch === "darkness") { attacker.heal(5); effects="лечение 5"; }
+        }
+        addLog(`✨ ${ARCHETYPES[arch].name} использует ${slot}: ${effects} [УСПЕХ]`);
+        checkDeathAndSync();
+        renderBattle();
+    }
+
+    function performAttackOrAbility(type, target) {
+        let attacker = getUnitAt(gameState.selectedCellPos.x, gameState.selectedCellPos.y);
+        if(!attacker || attacker.stunned) return;
+        let dmg = attacker.attack;
+        target.takeDamage(dmg);
+        addLog(`${attacker.archetype} атакует ${target.archetype} и наносит ${dmg} урона`);
+        checkDeathAndSync();
+        renderBattle();
+    }
+
+    function getUnitAt(x,y) {
+        let pUnit = gameState.battleUnits.playerUnits.find((_,idx)=> gameState.placementMap[x]?.[y] === gameState.myFighters[idx] && gameState.battleUnits.playerUnits[idx]?.alive);
+        if(pUnit) return {...pUnit, owner:"player"};
+        let oppIdx = gameState.opponentPlacementMap?.[x]?.[y] ? gameState.opponentPlacementMap.flat().indexOf(gameState.opponentPlacementMap[x][y]) : -1;
+        if(oppIdx>=0 && gameState.battleUnits.opponentUnits[oppIdx]?.alive) return {...gameState.battleUnits.opponentUnits[oppIdx], owner:"opponent"};
+        return null;
+    }
+    function getSelectedEnemy() {
+        if(!gameState.selectedCellPos) return null;
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++) {
+            let u = getUnitAt(i,j);
+            if(u && u.owner !== "player") return u;
+        }
+        return null;
+    }
+    function checkDeathAndSync() {
+        let allOpp = gameState.battleUnits.opponentUnits.filter(u=>u.alive);
+        if(allOpp.length===0 || gameState.battleUnits.opponentKing.hp<=0) { addLog("ПОБЕДА! Противник повержен"); resetToLobby(); return; }
+        let allPlayer = gameState.battleUnits.playerUnits.filter(u=>u.alive);
+        if(allPlayer.length===0 || gameState.battleUnits.playerKing.hp<=0) { addLog("ПОРАЖЕНИЕ..."); resetToLobby(); return; }
+        sendGameState({ type:"syncFullState", battleUnits: gameState.battleUnits, currentTurn: gameState.currentTurn, stunnedUnits: gameState.stunnedUnits });
+    }
+    function endTurn() {
+        gameState.currentTurn = "opponent";
+        addLog("Ход передан противнику");
+        sendGameState({ type:"syncFullState", battleUnits: gameState.battleUnits, currentTurn: "opponent", stunnedUnits:[] });
+        renderUI();
+    }
+    function applyRemoteAction(action) { /* заглушка для синхр атак */ }
+    function resetToLobby() { gameState.phase="lobby"; renderUI(); }
+
+    renderUI();
+</script>
+</body>
+</html>
