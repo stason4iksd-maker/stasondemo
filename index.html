@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Minecraft King's Brawl | Кристаллы и Энд | Dark Debug</title>
+    <title>Minecraft King's Brawl | Dark Debug Mode</title>
+    <!-- PeerJS для P2P мультиплеера -->
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -24,6 +25,7 @@
             background-size: 24px 24px;
         }
 
+        /* Тёмная тема с текстурой камня */
         .game-container {
             max-width: 1300px;
             width: 100%;
@@ -34,6 +36,7 @@
             border: 1px solid #4a3f2c;
         }
 
+        /* Панель логов и отладки */
         .debug-panel {
             background: #0b0e0a;
             border: 1px solid #5e5a3c;
@@ -79,6 +82,7 @@
             color: #cfe8cf;
         }
 
+        /* Меню / Лобби */
         .lobby-screen, .pick-screen, .placement-screen, .battle-screen {
             transition: all 0.2s;
         }
@@ -94,7 +98,7 @@
         .hero-card {
             background: #2d2b21;
             border-radius: 20px;
-            width: 180px;
+            width: 170px;
             padding: 12px;
             text-align: center;
             cursor: pointer;
@@ -113,11 +117,10 @@
         .hero-card img {
             width: 90px;
             height: 90px;
-            image-rendering: crisp-edges;
+            image-rendering: pixelated;
             background: #1e1b12;
-            border-radius: 20px;
+            border-radius: 50%;
             padding: 5px;
-            object-fit: contain;
         }
 
         .hero-name {
@@ -221,11 +224,22 @@
             font-weight: bold;
         }
 
+        .status-tip {
+            background: #00000099;
+            border-radius: 12px;
+            padding: 4px 12px;
+        }
+
         .turn-indicator {
             background: #7a6a3a;
             display: inline-block;
             padding: 6px 18px;
             border-radius: 40px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; text-shadow: 0 0 4px gold; }
         }
     </style>
 </head>
@@ -233,48 +247,28 @@
 <div class="game-container" id="gameRoot"></div>
 
 <script>
-    // ------------------- ОБНОВЛЕННЫЕ АРХЕТИПЫ С НОВЫМИ КАРТИНКАМИ -------------------
+    // ------------------- АРХЕТИПЫ -------------------
     const ARCHETYPES = {
-        crystal: { 
-            name: "Кристалл", 
-            img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490704687941292143/wewew.png?ex=69d5066d&is=69d3b4ed&hm=0cd51fd67dac6954033d648f9b239f6d88320d7c7b3f9ad619a1627063d9834c&", 
-            hp: 24, attack: 7, 
-            skillQ: "Энергоблок", skillE: "Перегрузка" 
-        },
-        copper: { 
-            name: "Медь", 
-            img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490709460229034164/3.png?ex=69d50adf&is=69d3b95f&hm=ca4926e543babc40b3d89b18b46df5277326ab8fef087c1d80dd84555c6d2532&", 
-            hp: 32, attack: 5, 
-            skillQ: "Сейсмический удар", skillE: "Окаменение" 
-        },
-        powercard: { 
-            name: "Силовая карта", 
-            img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490717514924298250/8bd532d01f4bd0e9.png?ex=69d5125f&is=69d3c0df&hm=456bc7aa28667785b0094ff95335b3279f3946525164a3908003c1718b6e81ec&", 
-            hp: 22, attack: 6, 
-            skillQ: "Лечение свитком", skillE: "Знание-кара" 
-        },
-        end: { 
-            name: "Энд", 
-            img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490720976550236301/model.png?ex=69d51599&is=69d3c419&hm=80d419d200afa8b791486ad8050ae51a6478235cd044b7e678154dedfcf66cdc&", 
-            hp: 26, attack: 6, 
-            skillQ: "Звуковой удар", skillE: "Бафф ритма" 
-        },
-        cooldnes: { 
-            name: "❄️ Cooldnes", 
-            img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490723488011653171/79b4010918559d62.png?ex=69d517ef&is=69d3c66f&hm=5a6c149ec7a24a30af19e071bc5b856e435add0d30f59dd29893af3c9452428c&", 
-            hp: 28, attack: 6, 
-            skillQ: "Теневой укус", skillE: "Восстановление тьмы",
-            special: true   // особая, доступна только игроку (но для баланса оставим как обычную)
-        }
+        redstone: { name: "Редстоун", img: "https://cdn.discordapp.com/attachments/123456789/redstone.png?width=80", hp: 24, attack: 7, skillQ: "Энергоблок", skillE: "Перегрузка" },
+        stone: { name: "Камень", img: "https://cdn.discordapp.com/attachments/123456789/stone.png?width=80", hp: 32, attack: 5, skillQ: "Сейсмический удар", skillE: "Окаменение" },
+        book: { name: "Книжный", img: "https://cdn.discordapp.com/attachments/123456789/book.png?width=80", hp: 22, attack: 6, skillQ: "Лечение свитком", skillE: "Знание-кара" },
+        headphones: { name: "Наушники", img: "https://cdn.discordapp.com/attachments/123456789/headphones.png?width=80", hp: 26, attack: 6, skillQ: "Звуковой удар", skillE: "Бафф ритма" },
+        darkness: { name: "Тьма", img: "https://cdn.discordapp.com/attachments/123456789/darkness.png?width=80", hp: 28, attack: 6, skillQ: "Теневой укус", skillE: "Восстановление тьмы" }
     };
+    // реальные картинки (рабочие замены)
+    ARCHETYPES.redstone.img = "https://cdn-icons-png.flaticon.com/512/3448/3448586.png";
+    ARCHETYPES.stone.img = "https://cdn-icons-png.flaticon.com/512/1670/1670906.png";
+    ARCHETYPES.book.img = "https://cdn-icons-png.flaticon.com/512/2232/2232688.png";
+    ARCHETYPES.headphones.img = "https://cdn-icons-png.flaticon.com/512/2645/2645890.png";
+    ARCHETYPES.darkness.img = "https://cdn-icons-png.flaticon.com/512/3665/3665204.png";
 
-    // Пассивки королей (привязаны к новым ключам)
+    // Королевские пассивки
     const KING_PASSIVES = {
-        crystal: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки всем кристаллам" },
-        copper: { bonusAtk: 0, bonusHp: 6, regen: 0, desc: "+6 HP меди" },
-        powercard: { bonusAtk: 1, bonusHp: 3, regen: 0, desc: "+1 атака +3 HP силовым картам" },
-        end: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки энду" },
-        cooldnes: { bonusAtk: 0, bonusHp: 2, regen: 1, desc: "Реген +1 в начале хода Cooldnes" }
+        redstone: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки всем редстоун бойцам" },
+        stone: { bonusAtk: 0, bonusHp: 6, regen: 0, desc: "+6 HP камням" },
+        book: { bonusAtk: 1, bonusHp: 3, regen: 0, desc: "+1 атака +3 HP книжным" },
+        headphones: { bonusAtk: 2, bonusHp: 0, regen: 0, desc: "+2 атаки наушникам" },
+        darkness: { bonusAtk: 0, bonusHp: 2, regen: 1, desc: "Реген +1 в начале хода бойцам тьмы" }
     };
 
     // Глобальное состояние
@@ -299,11 +293,12 @@
         currentTurn: "player", // player / opponent
         battleActive: false,
         battleUnits: { playerUnits: [], opponentUnits: [], playerKing: null, opponentKing: null },
-        selectedCellPos: null, // {x,y}
-        stunnedUnits: [],
+        selectedCellPos: null, // {x,y} для атаки/способностей
+        stunnedUnits: [], // { id, turnsLeft }
         debugMode: true
     };
 
+    // Вспомогательные функции
     function addLog(msg, isError = false) {
         const logDiv = document.getElementById("debugLog");
         if (logDiv) {
@@ -321,7 +316,7 @@
         constructor(archetype, owner, index, kingBonus = { bonusAtk:0, bonusHp:0, regen:0 }) {
             this.id = `${owner}_${archetype}_${index}_${Date.now()}_${Math.random()}`;
             this.archetype = archetype;
-            this.owner = owner;
+            this.owner = owner; // "player" or "opponent"
             this.baseHp = ARCHETYPES[archetype].hp + (kingBonus.bonusHp || 0);
             this.hp = this.baseHp;
             this.baseAttack = ARCHETYPES[archetype].attack + (kingBonus.bonusAtk || 0);
@@ -336,6 +331,7 @@
         clearStun() { this.stunned = false; }
     }
 
+    // отрисовка всей игры (рендер по состоянию)
     function renderUI() {
         const root = document.getElementById("gameRoot");
         if (!root) return;
@@ -348,8 +344,8 @@
     function renderLobby(root) {
         root.innerHTML = `
             <div style="text-align:center; padding:20px;">
-                <h1 style="color:#d7c87e;">⚔️ MINECRAFT KING'S BRAWL | CRYSTAL ⚔️</h1>
-                <div class="debug-panel"><span class="debug-badge">🐞 РЕЖИМ ОТЛАДКИ</span><span>PeerJS P2P | Новые архетипы</span></div>
+                <h1 style="color:#d7c87e;">⚔️ MINECRAFT KING'S BRAWL ⚔️</h1>
+                <div class="debug-panel"><span class="debug-badge">🐞 РЕЖИМ ОТЛАДКИ АКТИВЕН</span><span>PeerJS P2P | Тёмный фон</span></div>
                 <input type="text" id="nickInput" placeholder="Ваш ник" style="padding:12px;width:200px;margin:10px;border-radius:30px;background:#2f2b1c;color:white;border:none;">
                 <br>
                 <button id="createRoomBtn">🎮 СОЗДАТЬ КОМНАТУ</button>
@@ -426,6 +422,7 @@
             applyRemoteAction(data.action);
         }
         else if(data.type === "syncFullState") {
+            // синхронизация боя
             gameState.battleUnits = data.battleUnits;
             gameState.currentTurn = data.currentTurn;
             gameState.stunnedUnits = data.stunnedUnits || [];
@@ -440,7 +437,7 @@
         let kingSelected = gameState.myKing;
         let fightersSelected = gameState.myFighters.length;
         root.innerHTML = `<div style="padding:20px"><h2>👑 Выберите КОРОЛЯ (пассивка)</h2><div class="card-grid" id="kingGrid"></div>
-        <h2>⚔️ Выберите 3 БОЙЦОВ (архетипы с новыми скинами)</h2><div class="card-grid" id="fighterGrid"></div>
+        <h2>⚔️ Выберите 3 БОЙЦОВ</h2><div class="card-grid" id="fighterGrid"></div>
         <div style="margin-top:20px"><button id="readyPickBtn">✅ ГОТОВ (${fightersSelected}/3) ${kingSelected ? "король выбран" : "нет короля"}</button></div>
         <div class="debug-panel"><span>Ваш ник: ${gameState.myName}</span><span>Противник: ${gameState.opponentName || "ожидание"}</span></div>
         </div>`;
@@ -468,7 +465,7 @@
                     }
                     const unit = new Unit(arch, "player", gameState.myFighters.length, bonus);
                     gameState.myFighters.push(unit);
-                } else alert("Максимум 3 разных бойца (уникальные архетипы)");
+                } else alert("Максимум 3 разных бойца");
                 renderPickCards(root);
             };
             if(gameState.myFighters.some(f=>f.archetype===arch)) card.classList.add("selected");
@@ -485,9 +482,8 @@
 
     function createCard(arch, isKing) {
         const div = document.createElement("div"); div.className = "hero-card";
-        const data = ARCHETYPES[arch];
-        div.innerHTML = `<img src="${data.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1670/1670906.png'"><div class="hero-name">${data.name}</div>
-        <div class="hero-desc">❤️ ${data.hp} ⚔️ ${data.attack}<br>${isKing ? "👑 Пассивка: "+KING_PASSIVES[arch].desc : "🎯 Q/E: " + data.skillQ + " / " + data.skillE}</div>`;
+        div.innerHTML = `<img src="${ARCHETYPES[arch].img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1670/1670906.png'"><div class="hero-name">${ARCHETYPES[arch].name}</div>
+        <div class="hero-desc">❤️ ${ARCHETYPES[arch].hp} ⚔️ ${ARCHETYPES[arch].attack}<br>${isKing ? "👑 Пассивка: "+KING_PASSIVES[arch].desc : "🎯 Q/E способности"}</div>`;
         return div;
     }
 
@@ -503,7 +499,7 @@
         let gridHtml = `<div class="field-grid" id="placementGrid">`;
         for(let i=0;i<5;i++) for(let j=0;j<5;j++) {
             let unitHere = gameState.placementMap[i][j];
-            gridHtml += `<div class="cell owner-0" data-x="${i}" data-y="${j}">${unitHere ? `✨ ${ARCHETYPES[unitHere.archetype].name}` : "⬚"}</div>`;
+            gridHtml += `<div class="cell owner-0" data-x="${i}" data-y="${j}">${unitHere ? `🧙 ${unitHere.archetype}` : "⬚"}</div>`;
         }
         gridHtml += `</div><p>Разместите 3 бойцов на поле (клик по клетке)</p><button id="placementDoneBtn">🏁 ГОТОВО</button>`;
         root.innerHTML = `<div style="padding:20px"><h2>Расстановка отряда</h2>${gridHtml}<div class="debug-panel">Противник расстановка: ${gameState.opponentPlacementReady ? "✅" : "⏳"}</div></div>`;
@@ -512,8 +508,9 @@
             cell.addEventListener("click", (e) => {
                 let x = parseInt(cell.dataset.x), y = parseInt(cell.dataset.y);
                 if(gameState.placementMap[x][y]) return;
+                let remaining = 3 - gameState.myFighters.filter(f => f.alive !== false).length;
                 let placed = gameState.placementMap.flat().filter(c=>c).length;
-                if(placed >= 3) return alert("Все 3 бойца уже расставлены");
+                if(placed >= 3) return alert("Уже расставлены все 3");
                 let fighterToPlace = gameState.myFighters[placed];
                 if(fighterToPlace) gameState.placementMap[x][y] = fighterToPlace;
                 renderPlacement(root);
@@ -529,6 +526,7 @@
     }
 
     function startBattle() {
+        // формируем юнитов
         let playerUnits = gameState.placementMap.flat().filter(u=>u);
         let opponentUnitsRaw = gameState.opponentPlacementMap.flat().filter(u=>u);
         let opponentUnits = opponentUnitsRaw.map(u=> {
@@ -549,12 +547,12 @@
         let turnText = gameState.currentTurn === "player" ? "🔵 ВАШ ХОД" : "🔴 ХОД СОПЕРНИКА";
         let grid = `<div class="field-grid">`;
         for(let i=0;i<5;i++) for(let j=0;j<5;j++) {
-            let unit = gameState.battleUnits.playerUnits.find((_,idx)=> gameState.placementMap[i]?.[j] === gameState.myFighters[idx] && gameState.battleUnits.playerUnits[idx]?.alive);
-            let oppUnit = gameState.battleUnits.opponentUnits.find((_,idx)=> gameState.opponentPlacementMap?.[i]?.[j] === gameState.opponentPlacementMap?.flat().filter(u=>u)[idx] && gameState.battleUnits.opponentUnits[idx]?.alive);
+            let unit = gameState.battleUnits.playerUnits.find((_,idx)=> gameState.placementMap[i]?.[j] === gameState.myFighters[idx]);
+            let oppUnit = gameState.battleUnits.opponentUnits.find((_,idx)=> gameState.opponentPlacementMap?.[i]?.[j] === gameState.opponentPlacementMap?.flat().filter(u=>u)[idx]);
             let content = "";
             let owner = "";
-            if(unit && unit.alive) { content = `${ARCHETYPES[unit.archetype].name}❤️${unit.hp}`; owner = "player"; }
-            else if(oppUnit && oppUnit.alive) { content = `${ARCHETYPES[oppUnit.archetype].name}❤️${oppUnit.hp}`; owner = "opponent"; }
+            if(unit && unit.alive) { content = `${unit.archetype}❤️${unit.hp}`; owner = "player"; }
+            else if(oppUnit && oppUnit.alive) { content = `${oppUnit.archetype}❤️${oppUnit.hp}`; owner = "opponent"; }
             else content = "⬚";
             let cls = `cell owner-${owner === "player" ? 0 : 1}`;
             if(gameState.selectedCellPos && gameState.selectedCellPos.x === i && gameState.selectedCellPos.y === j) cls+=" selected-unit";
@@ -567,10 +565,10 @@
         } else if(gameState.currentTurn === "player") {
             actionBar = `<div class="action-bar"><button id="endTurnBtn">⏭️ Завершить ход без атаки</button></div>`;
         }
-        let kingPanel = `<div class="king-panel"><span>👑 Ваш Король (${gameState.myKing?.archetype ? ARCHETYPES[gameState.myKing.archetype].name : "Король"}): ❤️ ${gameState.battleUnits.playerKing.hp}</span><span>👑 Противник: ❤️ ${gameState.battleUnits.opponentKing.hp}</span></div>`;
+        let kingPanel = `<div class="king-panel"><span>👑 Ваш Король: ❤️ ${gameState.battleUnits.playerKing.hp}</span><span>👑 Противник: ❤️ ${gameState.battleUnits.opponentKing.hp}</span></div>`;
         root.innerHTML = `<div style="padding:10px"><div class="turn-indicator">${turnText}</div>${kingPanel}${grid}${actionBar}<div id="battleLog" class="log-area" style="margin-top:20px"><div id="debugLog"></div></div></div>`;
         attachBattleEvents();
-        addLog("Битва началась! Используйте новые архетипы.");
+        addLog("Битва началась!");
     }
 
     function attachBattleEvents() {
@@ -609,17 +607,17 @@
         let effects = "";
         if(!hit) { addLog(`❌ ПРОМАХ! ${ARCHETYPES[arch].name} промахнулся способностью ${slot}`); return; }
         if(slot === "Q") {
-            if(arch === "crystal") { target.takeDamage(7); effects="урон 7"; }
-            else if(arch === "copper") { target.applyStun(); effects="оглушение"; }
-            else if(arch === "powercard") { attacker.heal(6); effects="лечение +6 себе"; }
-            else if(arch === "end") { target.takeDamage(5); attacker.attack += 1; effects="урон 5 + атака +1"; }
-            else if(arch === "cooldnes") { target.takeDamage(5); attacker.heal(2); effects="урон 5, лечение 2 (Cooldnes)"); }
+            if(arch === "redstone") { target.takeDamage(7); effects="урон 7"; }
+            else if(arch === "stone") { target.applyStun(); effects="оглушение"; }
+            else if(arch === "book") { attacker.heal(6); effects="лечение +6 себе"; }
+            else if(arch === "headphones") { target.takeDamage(5); attacker.attack += 1; effects="урон 5 + атака +1"; }
+            else if(arch === "darkness") { target.takeDamage(5); attacker.heal(2); effects="урон 5, лечение 2"; }
         } else {
-            if(arch === "crystal") { attacker.attack += 2; effects="+2 атаки навсегда"; }
-            else if(arch === "copper") { attacker.heal(8); effects="лечение 8 HP"; }
-            else if(arch === "powercard") { target.takeDamage(9); effects="мощный урон 9"; }
-            else if(arch === "end") { let buf = Math.random()<0.5; if(buf) attacker.attack+=2; effects= buf ? "+2 атаки" : "ничего"; }
-            else if(arch === "cooldnes") { attacker.heal(5); effects="лечение 5 (особая способность)"; }
+            if(arch === "redstone") { attacker.attack += 2; effects="+2 атаки навсегда"; }
+            else if(arch === "stone") { attacker.heal(8); effects="лечение 8 HP"; }
+            else if(arch === "book") { target.takeDamage(9); effects="мощный урон 9"; }
+            else if(arch === "headphones") { let buf = Math.random()<0.5; if(buf) attacker.attack+=2; effects= buf ? "+2 атаки" : "ничего"; }
+            else if(arch === "darkness") { attacker.heal(5); effects="лечение 5"; }
         }
         addLog(`✨ ${ARCHETYPES[arch].name} использует ${slot}: ${effects} [УСПЕХ]`);
         checkDeathAndSync();
@@ -631,7 +629,7 @@
         if(!attacker || attacker.stunned) return;
         let dmg = attacker.attack;
         target.takeDamage(dmg);
-        addLog(`${ARCHETYPES[attacker.archetype].name} атакует ${ARCHETYPES[target.archetype].name} и наносит ${dmg} урона`);
+        addLog(`${attacker.archetype} атакует ${target.archetype} и наносит ${dmg} урона`);
         checkDeathAndSync();
         renderBattle();
     }
@@ -664,7 +662,7 @@
         sendGameState({ type:"syncFullState", battleUnits: gameState.battleUnits, currentTurn: "opponent", stunnedUnits:[] });
         renderUI();
     }
-    function applyRemoteAction(action) { /* для синхронизации */ }
+    function applyRemoteAction(action) { /* заглушка для синхр атак */ }
     function resetToLobby() { gameState.phase="lobby"; renderUI(); }
 
     renderUI();
