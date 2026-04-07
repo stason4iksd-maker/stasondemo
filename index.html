@@ -3,153 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Minecraft King's Brawl | Полная тактическая версия</title>
+    <title>Minecraft King's Brawl — финальная версия</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
             user-select: none;
         }
-
         body {
-            background: #0a0c0a;
-            font-family: 'Courier New', 'Minecraft', 'Segoe UI', monospace;
+            background: #0a0f0a;
+            font-family: 'Segoe UI', 'Courier New', monospace;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: radial-gradient(rgba(30, 40, 20, 0.6) 2px, transparent 2px);
-            background-size: 24px 24px;
         }
-
         .game-container {
             max-width: 1300px;
             width: 100%;
-            background: #1e1f1c;
-            border-radius: 32px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
-            border: 1px solid #4a3f2c;
+            background: #1a1e18;
+            border-radius: 48px;
+            padding: 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+            border: 1px solid #5e7a4a;
         }
-
-        .debug-panel {
-            background: #0b0e0a;
-            border: 1px solid #5e5a3c;
-            border-radius: 20px;
-            padding: 12px 18px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #aaf0c0;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-family: monospace;
-        }
-
-        .log-area {
-            background: #030504c9;
-            border-radius: 16px;
-            padding: 8px 12px;
-            max-height: 140px;
-            overflow-y: auto;
-            font-size: 12px;
-            font-family: monospace;
-            width: 100%;
-            backdrop-filter: blur(2px);
-            margin-top: 15px;
-        }
-
-        .log-entry {
-            border-left: 3px solid #6a9c3e;
-            padding-left: 8px;
-            margin: 4px 0;
-            color: #cfe8cf;
-        }
-
-        .card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 18px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .hero-card {
-            background: #2d2b21;
-            border-radius: 20px;
-            width: 180px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid #6b5a3a;
-            transition: 0.1s linear;
-            box-shadow: 0 6px 0 #19170e;
-        }
-
-        .hero-card.selected {
-            border: 3px solid #f5c542;
-            background: #3e3a2a;
-            transform: scale(0.98);
-        }
-
-        .hero-card img {
-            width: 90px;
-            height: 90px;
-            image-rendering: crisp-edges;
-            background: #1e1b12;
-            border-radius: 20px;
-            padding: 5px;
-            object-fit: contain;
-        }
-
-        .hero-name {
-            font-weight: bold;
-            color: #f0e6a0;
-            margin: 8px 0 4px;
-        }
-
-        .hero-desc {
-            font-size: 11px;
-            color: #bbb082;
-        }
-
         button {
-            background: #3f3a2a;
+            background: #4a3e2c;
             border: none;
             font-family: inherit;
             font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: #f9f2cf;
-            font-size: 16px;
+            padding: 10px 24px;
+            border-radius: 60px;
+            color: #f7efc3;
+            font-size: 1rem;
             cursor: pointer;
             transition: 0.07s linear;
-            box-shadow: 0 4px 0 #1e1b0e;
+            box-shadow: 0 4px 0 #2a2218;
         }
-
         button:active {
             transform: translateY(2px);
-            box-shadow: 0 1px 0 #1e1b0e;
+            box-shadow: 0 1px 0 #2a2218;
         }
-
+        input {
+            background: #2e2c22;
+            border: 1px solid #b9a76b;
+            padding: 10px 16px;
+            border-radius: 40px;
+            color: #fff0c0;
+            font-size: 1rem;
+            margin: 8px;
+            width: 200px;
+        }
+        .panel {
+            background: #25291ec9;
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffdfa5;
+            text-align: center;
+            margin: 0 0 16px 0;
+            text-shadow: 2px 2px 0 #4a3a1a;
+        }
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .hero-card {
+            background: #2d2b1f;
+            border-radius: 24px;
+            width: 170px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #aa8e54;
+            transition: 0.1s;
+        }
+        .hero-card.selected {
+            border: 3px solid #f5bc42;
+            background: #46422e;
+            transform: scale(0.98);
+        }
+        .hero-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: #1e1c12;
+            border-radius: 40px;
+            padding: 8px;
+        }
         .field-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 12px;
-            background: #2b2a20;
+            background: #2c3024;
             padding: 20px;
             border-radius: 28px;
             margin: 15px 0;
         }
-
         .cell {
             aspect-ratio: 5 / 4;
-            background: #3d3a2a;
+            background: #5a533a;
             border-radius: 16px;
             display: flex;
             flex-direction: column;
@@ -157,587 +118,478 @@
             justify-content: center;
             font-weight: bold;
             font-size: 11px;
-            color: #f2e1a0;
-            border: 2px solid #6a5e3a;
-            transition: 0.05s linear;
+            color: #ffe0aa;
+            border: 2px solid #c7a75b;
             cursor: pointer;
-            text-shadow: 0 0 3px black;
-            position: relative;
+            transition: 0.05s linear;
             text-align: center;
             padding: 4px;
-        }
-
-        .cell.owner-0 { background: #2f6b2f; border-color: #9ed96e; }
-        .cell.owner-1 { background: #8b3c2a; border-color: #e69d6e; }
-        .cell.selected-unit { box-shadow: 0 0 0 3px #ffcc44, inset 0 0 0 2px #ffdd77; }
-        .cell.target-highlight { box-shadow: 0 0 0 3px #ff4444, inset 0 0 0 2px #ff8888; }
-        .cell.wall-cell { background: #55503b; border-color: #bc9a5a; position: relative; }
-        .cell.wall-cell::after { content: "🧱"; font-size: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.8; }
-
-        .action-bar {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .skill-btn {
-            background: #2d2b1a;
-            padding: 12px 24px;
-            font-size: 18px;
-            min-width: 140px;
             position: relative;
         }
-        .skill-btn.cooldown::after {
-            content: attr(data-cd);
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #aa3333;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
+        .cell.owner-p1 { background: #2f6b2f; border-color: #a5e0a5; }
+        .cell.owner-p2 { background: #8b3c2a; border-color: #ffb084; }
+        .cell.selected-unit { box-shadow: 0 0 0 3px #ffcc44; }
+        .cell.target-highlight { box-shadow: 0 0 0 3px #ff4444; }
+        .cell.wall { background: #5e5a40; }
+        .action-bar {
             display: flex;
-            align-items: center;
+            gap: 16px;
             justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            flex-wrap: wrap;
+            margin: 20px 0;
         }
-
-        .king-panel {
-            background: #181e12;
-            border-radius: 32px;
+        .log-area {
+            background: #0e120ccc;
+            border-radius: 20px;
             padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-weight: bold;
+            height: 130px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #cbe5c2;
         }
-
         .turn-indicator {
-            background: #7a6a3a;
+            background: #00000099;
             display: inline-block;
-            padding: 6px 18px;
+            padding: 6px 24px;
             border-radius: 40px;
             margin-bottom: 15px;
+            font-weight: bold;
         }
-        .info-text { color: #d4c97a; font-size: 14px; margin: 8px 0; }
-        input { background: #2a2a1c; border: 1px solid #aa9966; padding: 8px; border-radius: 30px; color: #ffefc0; margin: 5px; }
+        .king-panel {
+            display: flex;
+            justify-content: space-between;
+            background: #1f231b;
+            border-radius: 28px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .ability-indicators {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 20px;
+            background: #000000aa;
+            padding: 12px 20px;
+            border-radius: 60px;
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            border: 1px solid #ffd966;
+        }
+        .ability-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #2a5a2a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+            text-shadow: 1px 1px 0 black;
+            transition: 0.1s;
+            box-shadow: 0 0 0 2px #ffd966;
+        }
+        .ability-circle.ready {
+            background: #2a8c2a;
+            box-shadow: 0 0 0 3px #aaffaa;
+        }
+        .ability-circle.cooldown {
+            background: #8a2a2a;
+            filter: grayscale(0.3);
+        }
+        .ability-letter {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .ability-cd {
+            font-size: 14px;
+            background: black;
+            border-radius: 20px;
+            padding: 2px 6px;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
-<div class="game-container" id="gameRoot"></div>
+<div class="game-container" id="app"></div>
+<div id="abilityIndicators" style="display: none;" class="ability-indicators">
+    <div class="ability-circle" id="indicatorQ">
+        <div class="ability-letter">Q</div>
+        <div class="ability-cd" id="cdQ">✓</div>
+    </div>
+    <div class="ability-circle" id="indicatorE">
+        <div class="ability-letter">E</div>
+        <div class="ability-cd" id="cdE">✓</div>
+    </div>
+</div>
 
 <script>
-    // ---------- АРХЕТИПЫ (НОВЫЕ СПОСОБНОСТИ ПОЛНОСТЬЮ) ----------
+    // ========== ДАННЫЕ ==========
     const ARCH = {
-        redstone: { name: "Редстоун", role: "controller", hp: 24, attack: 6, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683694703181988/c61ca776f00a0315.png?ex=69d4f2e0&is=69d3a160&hm=4182ba5d5aa1e290bc7e33b77f4d71c7337f4737b6da8fd7f6615fae26707829&", skillQ: "Скрытая ловушка", skillE: "Перегрузка" },
-        stone: { name: "Камень", role: "tank", hp: 32, attack: 4, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683844947611881/a7cfebed71d0b0e9.png?ex=69d4f304&is=69d3a184&hm=f0a0e4995630eb62742afc9fd3d13cbe5b9d85e261897eba286378784b16d162&", skillQ: "Провокация", skillE: "Каменная стена" },
-        book: { name: "Книжный", role: "support", hp: 22, attack: 5, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683587886842027/9f962d3280145492.png?ex=69d4f2c6&is=69d3a146&hm=0fdab9a2b2cb4f81849f98934b99e54bbedc486756252b6fb47bf8e28bbea25e&", skillQ: "Массовое лечение", skillE: "Проклятие знания" },
-        headset: { name: "Наушники", role: "buffer", hp: 24, attack: 5, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683788878024834/08a0fbe9622563ab.png?ex=69d4f2f6&is=69d3a176&hm=f1053cfee7f783bf840d8a14f31ab57675f3fd09a1bb0238e6a84b6bd4345c30&", skillQ: "Ритм", skillE: "Звуковая волна" },
-        darkness: { name: "Тьма", role: "vampire", hp: 28, attack: 6, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490684085750730772/456fd51ce1b6be2c.png?ex=69d4f33d&is=69d3a1bd&hm=2e663d696ff3f56af89234027b8f76c1667fb65e3401df6d07cc54945f358f30&", skillQ: "Теневой шаг", skillE: "Пожирание" }
+        redstone: { name: "Редстоун", role: "controller", hp: 24, atk: 6, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683694703181988/c61ca776f00a0315.png", q: "Ловушка", e: "Перегрузка" },
+        stone: { name: "Камень", role: "tank", hp: 32, atk: 4, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683844947611881/a7cfebed71d0b0e9.png", q: "Провокация", e: "Стена" },
+        book: { name: "Книжный", role: "support", hp: 22, atk: 5, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683587886842027/9f962d3280145492.png", q: "Массхил", e: "Проклятие" },
+        headset: { name: "Наушники", role: "buffer", hp: 24, atk: 5, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490683788878024834/08a0fbe9622563ab.png", q: "Ритм", e: "Волна" },
+        darkness: { name: "Тьма", role: "vampire", hp: 28, atk: 6, img: "https://cdn.discordapp.com/attachments/1490683424631947354/1490684085750730772/456fd51ce1b6be2c.png", q: "Теневой шаг", e: "Пожирание" }
+    };
+    const KING_PASS = {
+        redstone: { atk: 2, hp: 0 },
+        stone: { atk: 0, hp: 8 },
+        book: { atk: 1, hp: 4 },
+        headset: { atk: 2, hp: 0 },
+        darkness: { atk: 0, hp: 3 }
+    };
+    const KING_ACT = {
+        redstone: "2 ловушки",
+        stone: "щит +5 всем",
+        book: "полный хил",
+        headset: "+2 атаки команде",
+        darkness: "воскрешение 50%"
     };
 
-    const KING_PASSIVES = {
-        redstone: { bonusAtk: 2, bonusHp: 0, desc: "Редстоуны +2 атаки" },
-        stone: { bonusAtk: 0, bonusHp: 8, desc: "Каменные +8 HP и -20% урона" },
-        book: { bonusAtk: 1, bonusHp: 4, desc: "Книжные +1 атака, +4 HP" },
-        headset: { bonusAtk: 2, bonusHp: 0, desc: "Наушники +2 атаки" },
-        darkness: { bonusAtk: 0, bonusHp: 3, desc: "Тьма реген 2 в ход" }
-    };
-
-    // Активные способности королей
-    const KING_ACTIVES = {
-        redstone: "Ставит 2 ловушки сразу",
-        stone: "Щит +5 всем союзникам",
-        book: "Полный хил одного юнита",
-        headset: "Вся команда +2 атаки на ход",
-        darkness: "Воскрешает юнита с 50% HP"
-    };
-
-    // ---------- КЛАСС ЮНИТА (с поддержкой статусов, ловушек, стен) ----------
+    // ========== КЛАССЫ ==========
     class Unit {
-        constructor(archetype, owner, idSuffix, kingBonus = { bonusAtk:0, bonusHp:0 }) {
-            this.id = `${owner}_${archetype}_${idSuffix}_${Date.now()}_${Math.random()}`;
-            this.archetype = archetype;
+        constructor(arch, owner, id) {
+            this.id = id || `${owner}_${arch}_${Date.now()}_${Math.random()}`;
+            this.arch = arch;
             this.owner = owner;
-            this.role = ARCH[archetype].role;
-            this.baseHp = ARCH[archetype].hp + (kingBonus.bonusHp || 0);
-            this.hp = this.baseHp;
-            this.baseAttack = ARCH[archetype].attack + (kingBonus.bonusAtk || 0);
-            this.attack = this.baseAttack;
+            this.role = ARCH[arch].role;
+            this.maxHp = ARCH[arch].hp;
+            this.hp = this.maxHp;
+            this.baseAtk = ARCH[arch].atk;
+            this.atk = this.baseAtk;
             this.stunned = false;
             this.alive = true;
-            this.cooldownQ = 0;
-            this.cooldownE = 0;
-            this.tauntActive = false;      // провокация
-            this.buffAttack = 0;
-            this.shield = 0;                // дополнительный щит
-            this.extraAction = false;       // дополнительное действие от ритма
-            this.damageReduction = (this.role === 'tank') ? 0.25 : 0;
+            this.cdQ = 0;
+            this.cdE = 0;
+            this.taunt = false;
+            this.buffAtk = 0;
+            this.shield = 0;
+            this.dmgRed = (this.role === 'tank') ? 0.25 : 0;
         }
-        takeDamage(amount) {
-            let actual = amount;
-            if (this.shield > 0) {
-                let blocked = Math.min(this.shield, actual);
-                this.shield -= blocked;
-                actual -= blocked;
-                addLog(`${ARCH[this.archetype].name} щит поглотил ${blocked} урона`, false);
-            }
-            if (this.damageReduction > 0) actual = Math.floor(actual * (1 - this.damageReduction));
-            this.hp = Math.max(0, this.hp - actual);
-            if (this.hp <= 0) this.alive = false;
-            return actual;
+        takeDamage(amt) {
+            let dmg = amt;
+            if (this.shield > 0) { let block = Math.min(this.shield, dmg); this.shield -= block; dmg -= block; }
+            if (this.dmgRed) dmg = Math.floor(dmg * 0.75);
+            this.hp = Math.max(0, this.hp - dmg);
+            if (this.hp === 0) this.alive = false;
+            return dmg;
         }
-        heal(amount) { this.hp = Math.min(this.baseHp, this.hp + amount); }
+        heal(v) { this.hp = Math.min(this.maxHp, this.hp + v); }
         applyStun() { this.stunned = true; }
         clearStun() { this.stunned = false; }
-        reduceCooldowns() {
-            if (this.cooldownQ > 0) this.cooldownQ--;
-            if (this.cooldownE > 0) this.cooldownE--;
-            this.extraAction = false;
-            this.buffAttack = 0;
-            this.tauntActive = false;
-        }
+        reduceCD() { if(this.cdQ>0) this.cdQ--; if(this.cdE>0) this.cdE--; this.buffAtk=0; this.taunt=false; }
+    }
+    class Wall { constructor(x,y) { this.x=x; this.y=y; this.hp=10; } }
+    class Trap { constructor(x,y) { this.x=x; this.y=y; this.trig=false; }
+        activate(u) { if(this.trig) return false; this.trig=true; let r=Math.random()<0.5; if(r){ u.takeDamage(6); addLog(`Ловушка взорвалась: ${ARCH[u.arch].name} -6`); } else { u.applyStun(); addLog(`Ловушка оглушила ${ARCH[u.arch].name}`); } return true; }
     }
 
-    // Стена (препятствие)
-    class Wall {
-        constructor(x, y, owner) { this.x = x; this.y = y; owner; this.hp = 10; this.isWall = true; }
-        takeDamage(amount) { this.hp -= amount; return this.hp <= 0; }
-    }
-
-    // Ловушка
-    class Trap {
-        constructor(x, y, owner) { this.x = x; this.y = y; owner; this.triggered = false; }
-        activate(unit) {
-            if (this.triggered) return false;
-            this.triggered = true;
-            let dmgOrStun = Math.random() < 0.5;
-            if (dmgOrStun) {
-                unit.takeDamage(6);
-                addLog(`Ловушка взорвалась! ${ARCH[unit.archetype].name} получает 6 урона.`, false);
-            } else {
-                unit.applyStun();
-                addLog(`Ловушка оглушила ${ARCH[unit.archetype].name} на 1 ход!`, false);
-            }
-            return true;
-        }
-    }
-
-    // ---------- ГЛОБАЛЬНОЕ СОСТОЯНИЕ ----------
+    // ========== СОСТОЯНИЕ ==========
     let state = {
-        phase: "lobby", // lobby, pickCards, placement, battle
-        myPlayerId: null, // 'p1' или 'p2'
+        phase: "lobby",
+        myId: null,
         myNick: "",
-        players: {
-            p1: { nick: "", king: null, fighters: [], ready: false, placementMap: Array(5).fill().map(() => Array(5).fill(null)) },
-            p2: { nick: "", king: null, fighters: [], ready: false, placementMap: Array(5).fill().map(() => Array(5).fill(null)) }
-        },
+        p1: { nick: "", king: null, fighters: [], ready: false, map: Array(5).fill().map(()=>Array(5).fill(null)) },
+        p2: { nick: "", king: null, fighters: [], ready: false, map: Array(5).fill().map(()=>Array(5).fill(null)) },
         turn: "p1",
-        selectedCellPos: null,    // {x,y} свой боец
-        targetCellPos: null,       // {x,y} враг или клетка для способности
-        battleUnits: { p1Units: [], p2Units: [], p1King: null, p2King: null, walls: [], traps: [] },
-        peer: null,
-        conn: null,
-        roomId: null,
+        selectedCell: null,
+        targetCell: null,
+        battle: { p1Units: [], p2Units: [], p1King: null, p2King: null, walls: [], traps: [] },
+        peer: null, conn: null, roomId: null, botMode: false,
         log: []
     };
 
-    let root = document.getElementById("gameRoot");
+    let root = document.getElementById("app");
+    function addLog(m) { state.log.unshift(`[${new Date().toLocaleTimeString()}] ${m}`); if(state.log.length>20) state.log.pop(); renderLog(); if(state.conn?.open) state.conn.send({type:"log", msg:m}); }
+    function renderLog() { let el=document.getElementById("logArea"); if(el) el.innerHTML=state.log.map(l=>`<div>📜 ${l}</div>`).join(''); }
 
-    function addLog(msg, isError = false) {
-        state.log.unshift(`[${new Date().toLocaleTimeString()}] ${msg}`);
-        if (state.log.length > 25) state.log.pop();
-        renderLog();
-        if (state.conn && state.conn.open) state.conn.send({ type: "log", msg: msg });
-    }
-
-    function renderLog() {
-        let logDiv = document.getElementById("debugLog");
-        if (logDiv) {
-            logDiv.innerHTML = state.log.map(l => `<div class="log-entry">${l}</div>`).join('');
-        }
-    }
-
-    // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ПОЛЯ ----------
-    function getUnitAt(x, y) {
-        if (state.phase !== "battle") return null;
-        for (let u of state.battleUnits.p1Units) if (u.alive && state.players.p1.placementMap[x] && state.players.p1.placementMap[x][y] === u) return u;
-        for (let u of state.battleUnits.p2Units) if (u.alive && state.players.p2.placementMap[x] && state.players.p2.placementMap[x][y] === u) return u;
+    // ========== ХЕЛПЕРЫ ПОЛЯ ==========
+    function getUnit(x,y) {
+        if(state.phase!=="battle") return null;
+        for(let u of state.battle.p1Units) if(u.alive && state.p1.map[x]?.[y]===u) return u;
+        for(let u of state.battle.p2Units) if(u.alive && state.p2.map[x]?.[y]===u) return u;
         return null;
     }
+    function getWall(x,y) { return state.battle.walls.find(w=>w.x===x && w.y===y && w.hp>0); }
+    function getTrap(x,y) { return state.battle.traps.find(t=>t.x===x && t.y===y && !t.trig); }
+    function isWalkable(x,y) { if(x<0||x>4||y<0||y>4) return false; if(getUnit(x,y)) return false; if(getWall(x,y)) return false; return true; }
+    function dist(x1,y1,x2,y2) { return Math.max(Math.abs(x1-x2),Math.abs(y1-y2)); }
+    function canAttack(att, tx, ty, ax, ay) { let d=dist(ax,ay,tx,ty); if(att.role==='tank') return d<=1; return d<=2; }
+    function forcedTarget(att, ax, ay) {
+        let enemies=[];
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++) { let u=getUnit(i,j); if(u && u.owner!==att.owner && u.alive && dist(ax,ay,i,j)<=1) enemies.push(u); }
+        if(enemies.length===0) return null;
+        let taunt=enemies.find(e=>e.taunt);
+        if(taunt) return taunt;
+        enemies.sort((a,b)=>dist(ax,ay,findPos(a).x,findPos(a).y)-dist(ax,ay,findPos(b).x,findPos(b).y));
+        return enemies[0];
+    }
+    function findPos(unit) { for(let i=0;i<5;i++) for(let j=0;j<5;j++) if(state[unit.owner==='p1'?'p1':'p2'].map[i][j]===unit) return {x:i,y:j}; return null; }
 
-    function getWallAt(x, y) { return state.battleUnits.walls.find(w => w.x === x && w.y === y && w.hp > 0); }
-    function getTrapAt(x, y) { return state.battleUnits.traps.find(t => t.x === x && t.y === y && !t.triggered); }
+    // анимации
+    function animateHit(x,y) { let cells=document.querySelectorAll('.cell'); let idx=x*5+y; if(cells[idx]) { cells[idx].style.transform='scale(1.2)'; cells[idx].style.background='#aa4444'; setTimeout(()=>{ if(cells[idx]){ cells[idx].style.transform=''; cells[idx].style.background=''; } },200); } }
+    function animateDmg(x,y,dmg) { let cells=document.querySelectorAll('.cell'); let parent=cells[x*5+y]; if(!parent) return; let div=document.createElement('div'); div.innerText=`-${dmg}`; div.style.position='absolute'; div.style.color='#ff8888'; div.style.fontWeight='bold'; div.style.transition='all 0.4s'; parent.appendChild(div); setTimeout(()=>{ div.style.transform='translateY(-20px)'; div.style.opacity='0'; },20); setTimeout(()=>div.remove(),500); }
+    function animateDeath(x,y) { let cells=document.querySelectorAll('.cell'); let el=cells[x*5+y]; if(el){ el.style.transition='0.2s'; el.style.transform='scale(0)'; el.style.opacity='0'; setTimeout(()=>{ if(el){ el.style.transform=''; el.style.opacity=''; } },250); } }
 
-    function isWalkable(x, y, forPlayer) {
-        if (x<0 || x>4 || y<0 || y>4) return false;
-        if (getUnitAt(x,y)) return false;
-        if (getWallAt(x,y)) return false;
+    // ========== БОЕВЫЕ ДЕЙСТВИЯ ==========
+    function performAttack(att, tx, ty) {
+        let apos=findPos(att); if(!apos) return false;
+        let target=getUnit(tx,ty); if(!target || target.owner===att.owner) return false;
+        if(!canAttack(att,tx,ty,apos.x,apos.y)){ addLog("Слишком далеко"); return false; }
+        let forced=forcedTarget(att,apos.x,apos.y);
+        if(forced && forced!==target){ addLog("Обязан атаковать ближайшего врага"); return false; }
+        let dmg=att.atk+att.buffAtk;
+        let real=target.takeDamage(dmg);
+        addLog(`${ARCH[att.arch].name} атакует ${ARCH[target.arch].name} на ${real} урона`);
+        animateHit(tx,ty); animateDmg(tx,ty,real);
+        if(!target.alive) animateDeath(tx,ty);
+        if(att.role==='vampire') { let heal=Math.floor(real*0.5); att.heal(heal); addLog(`${ARCH[att.arch].name} восстановил ${heal}`); }
         return true;
     }
 
-    function getDistance(x1,y1,x2,y2) { return Math.max(Math.abs(x1-x2), Math.abs(y1-y2)); }
-
-    function isValidAttackRange(attacker, targetX, targetY, attackerX, attackerY) {
-        let dist = getDistance(attackerX, attackerY, targetX, targetY);
-        if (attacker.role === 'tank') return dist <= 1;
-        return dist <= 2;
-    }
-
-    function getForcedTarget(attacker, attackerX, attackerY) {
-        let enemies = [];
-        for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-            let u = getUnitAt(i,j);
-            if (u && u.owner !== attacker.owner && u.alive && getDistance(attackerX,attackerY,i,j) <= 1) enemies.push(u);
-        }
-        if (enemies.length === 0) return null;
-        let taunt = enemies.find(e => e.tauntActive);
-        return taunt || enemies[0];
-    }
-
-    // ---------- ЛОГИКА СПОСОБНОСТЕЙ (НОВЫЕ МЕХАНИКИ) ----------
-    function useAbility(attacker, targetX, targetY, slot) {
-        if (attacker.stunned) { addLog(`${ARCH[attacker.archetype].name} оглушён!`); return false; }
-        let attackerPos = state.selectedCellPos;
-        if (!attackerPos) return false;
-        // проверка дистанции для способностей (кроме телепорта/ловушек)
-        let dist = getDistance(attackerPos.x, attackerPos.y, targetX, targetY);
-        if (slot === 'Q' && attacker.archetype === 'darkness') {
-            // теневой шаг: телепорт в любую клетку рядом с врагом (проверка позже)
-        } else if (slot === 'E' && attacker.archetype === 'headset') {
-            // звуковая волна - линия, отдельная проверка
-        } else {
-            if (dist > 2 && attacker.role !== 'tank') { addLog("Слишком далеко для способности"); return false; }
-            if (dist > 1 && attacker.role === 'tank') { addLog("Танк может использовать способности только рядом"); return false; }
-        }
-
-        let forced = getForcedTarget(attacker, attackerPos.x, attackerPos.y);
-        let targetUnit = getUnitAt(targetX, targetY);
-        if (forced && targetUnit !== forced && slot !== 'Q' && attacker.archetype !== 'redstone') {
-            addLog("Вы обязаны атаковать ближайшего врага!");
-            return false;
-        }
-
-        let cd = (slot === 'Q') ? attacker.cooldownQ : attacker.cooldownE;
-        if (cd > 0) { addLog(`Способность перезарядится через ${cd} ходов`); return false; }
-
-        let chance = 0.75;
-        let success = Math.random() < chance;
-        if (!success) { addLog(`${ARCH[attacker.archetype].name} промахнулся!`); return true; } // ход не тратится? тратим для баланса
-
-        let arch = attacker.archetype;
-        let msg = "";
-        if (slot === 'Q') {
-            switch(arch) {
-                case 'redstone': // поставить ловушку
-                    if (isWalkable(targetX, targetY, attacker.owner) && !getTrapAt(targetX,targetY)) {
-                        state.battleUnits.traps.push(new Trap(targetX, targetY, attacker.owner));
-                        msg = `Поставлена скрытая ловушка на (${targetX+1},${targetY+1})`;
-                        attacker.cooldownQ = 2;
-                    } else msg = "Нельзя поставить ловушку здесь!";
-                    break;
-                case 'stone': // провокация
-                    for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-                        let u = getUnitAt(i,j);
-                        if (u && u.owner !== attacker.owner && u.alive && getDistance(attackerPos.x,attackerPos.y,i,j) <= 1) {
-                            u.tauntActive = true;
-                        }
-                    }
-                    msg = "Провокация: враги рядом обязаны атаковать вас!";
-                    attacker.cooldownQ = 2;
-                    break;
-                case 'book': // массовое лечение
-                    for (let u of (attacker.owner === 'p1' ? state.battleUnits.p1Units : state.battleUnits.p2Units)) {
-                        if (u.alive) u.heal(4);
-                    }
-                    msg = "Все союзники восстановили 4 HP";
-                    attacker.cooldownQ = 2;
-                    break;
-                case 'headset': // ритм
-                    for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-                        let u = getUnitAt(i,j);
-                        if (u && u.owner === attacker.owner && u.alive && getDistance(attackerPos.x,attackerPos.y,i,j) <= 1) {
-                            u.buffAttack += 1;
-                            u.extraAction = true;
-                        }
-                    }
-                    msg = "Ритм: союзники рядом +1 атака и доп. действие";
-                    attacker.cooldownQ = 3;
-                    break;
-                case 'darkness': // теневой шаг
-                    let targetEnemy = getUnitAt(targetX, targetY);
-                    if (targetEnemy && targetEnemy.owner !== attacker.owner && getDistance(attackerPos.x,attackerPos.y,targetX,targetY) <= 2) {
-                        // телепорт к врагу
-                        for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-                            if (state.players[attacker.owner].placementMap[i][j] === attacker) {
-                                state.players[attacker.owner].placementMap[i][j] = null;
-                                break;
-                            }
-                        }
-                        let newX = targetX, newY = targetY;
-                        // ищем свободную клетку рядом с врагом
-                        let moved = false;
-                        for (let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++) {
-                            let nx = targetX+dx, ny = targetY+dy;
-                            if (nx>=0 && nx<5 && ny>=0 && ny<5 && isWalkable(nx,ny,attacker.owner)) {
-                                state.players[attacker.owner].placementMap[nx][ny] = attacker;
-                                moved = true; break;
-                            }
-                        }
-                        if (!moved) { addLog("Нет места для телепорта"); return false; }
-                        targetEnemy.takeDamage(4);
-                        msg = "Теневой шаг: телепорт и удар 4 урона";
-                    } else { addLog("Нет врага рядом для теневого шага"); return false; }
-                    attacker.cooldownQ = 2;
-                    break;
-                default: msg = "Способность не реализована";
-            }
-        } else { // E способность
-            switch(arch) {
+    function useSkill(att, tx, ty, slot) {
+        let apos=findPos(att); if(!apos) return false;
+        let targetUnit=getUnit(tx,ty);
+        let cd=(slot==='Q')?att.cdQ:att.cdE;
+        if(cd>0){ addLog(`Перезарядка ${cd} ходов`); return false; }
+        if(Math.random()<0.25){ addLog("Промах!"); return true; }
+        let arch=att.arch; let msg="";
+        if(slot==='Q'){
+            switch(arch){
                 case 'redstone':
-                    attacker.buffAttack += 3;
-                    attacker.takeDamage(4);
-                    msg = "Перегрузка: +3 атаки на 2 хода, но 4 урона себе";
-                    attacker.cooldownE = 3;
+                    if(isWalkable(tx,ty) && !getTrap(tx,ty)){ state.battle.traps.push(new Trap(tx,ty)); msg="Ловушка поставлена"; att.cdQ=2; }
+                    else msg="Нельзя поставить ловушку";
                     break;
                 case 'stone':
-                    if (isWalkable(targetX, targetY, attacker.owner) && !getWallAt(targetX,targetY)) {
-                        state.battleUnits.walls.push(new Wall(targetX, targetY, attacker.owner));
-                        msg = `Каменная стена (10 HP) на (${targetX+1},${targetY+1})`;
-                    } else msg = "Нельзя поставить стену здесь";
-                    attacker.cooldownE = 3;
+                    for(let i=0;i<5;i++) for(let j=0;j<5;j++){ let u=getUnit(i,j); if(u && u.owner!==att.owner && u.alive && dist(apos.x,apos.y,i,j)<=1) u.taunt=true; }
+                    msg="Провокация активирована"; att.cdQ=2;
                     break;
                 case 'book':
-                    let enemy = getUnitAt(targetX, targetY);
-                    if (enemy && enemy.owner !== attacker.owner) {
-                        enemy.buffAttack -= 2;
-                        enemy.takeDamage(3);
-                        msg = "Проклятие знания: -2 атаки и 3 урона";
-                    } else msg = "Нет врага для проклятия";
-                    attacker.cooldownE = 3;
+                    let team=(att.owner==='p1')?state.battle.p1Units:state.battle.p2Units;
+                    team.forEach(u=>{ if(u.alive) u.heal(4); });
+                    msg="Массовое лечение +4"; att.cdQ=2;
                     break;
-                case 'headset': // звуковая волна (линия)
-                    let dx = Math.sign(targetX - attackerPos.x);
-                    let dy = Math.sign(targetY - attackerPos.y);
-                    let x = attackerPos.x, y = attackerPos.y;
-                    let hit = false;
-                    while (x>=0 && x<5 && y>=0 && y<5) {
-                        x += dx; y += dy;
-                        if (x<0 || x>=5 || y<0 || y>=5) break;
-                        let u = getUnitAt(x,y);
-                        if (u && u.owner !== attacker.owner) { u.takeDamage(5); hit = true; }
+                case 'headset':
+                    for(let i=0;i<5;i++) for(let j=0;j<5;j++){ let u=getUnit(i,j); if(u && u.owner===att.owner && u.alive && dist(apos.x,apos.y,i,j)<=1){ u.buffAtk+=1; u.extra=true; } }
+                    msg="Ритм: +1 атака союзникам рядом"; att.cdQ=3;
+                    break;
+                case 'darkness':
+                    let enemy=getUnit(tx,ty);
+                    if(enemy && enemy.owner!==att.owner && dist(apos.x,apos.y,tx,ty)<=2){
+                        for(let i=0;i<5;i++) for(let j=0;j<5;j++) if(state[att.owner==='p1'?'p1':'p2'].map[i][j]===att) state[att.owner==='p1'?'p1':'p2'].map[i][j]=null;
+                        let moved=false;
+                        for(let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++){ let nx=tx+dx, ny=ty+dy; if(nx>=0&&nx<5&&ny>=0&&ny<5 && isWalkable(nx,ny)){ state[att.owner==='p1'?'p1':'p2'].map[nx][ny]=att; moved=true; break; } }
+                        if(!moved){ addLog("Нет места для телепорта"); return false; }
+                        enemy.takeDamage(4); animateHit(tx,ty); animateDmg(tx,ty,4); if(!enemy.alive) animateDeath(tx,ty);
+                        msg="Теневой шаг + удар 4"; att.cdQ=2;
+                    } else msg="Нет врага рядом";
+                    break;
+            }
+        } else {
+            switch(arch){
+                case 'redstone': att.buffAtk+=3; att.takeDamage(4); msg="Перегрузка +3 атаки, -4 себе"; att.cdE=3; break;
+                case 'stone':
+                    if(isWalkable(tx,ty) && !getWall(tx,ty)){ state.battle.walls.push(new Wall(tx,ty)); msg="Каменная стена (10 HP)"; att.cdE=3; }
+                    else msg="Нельзя поставить стену";
+                    break;
+                case 'book':
+                    let curse=getUnit(tx,ty);
+                    if(curse && curse.owner!==att.owner){ curse.buffAtk-=2; curse.takeDamage(3); animateHit(tx,ty); animateDmg(tx,ty,3); if(!curse.alive) animateDeath(tx,ty); msg="Проклятие: -2 атаки, 3 урона"; att.cdE=3; }
+                    else msg="Нет врага";
+                    break;
+                case 'headset':
+                    let dx=Math.sign(tx-apos.x), dy=Math.sign(ty-apos.y);
+                    let x=apos.x+dx, y=apos.y+dy; let hit=false;
+                    while(x>=0 && x<5 && y>=0 && y<5){
+                        let u=getUnit(x,y); if(u && u.owner!==att.owner){ u.takeDamage(5); animateHit(x,y); animateDmg(x,y,5); if(!u.alive) animateDeath(x,y); hit=true; }
+                        x+=dx; y+=dy;
                     }
-                    msg = hit ? "Звуковая волна нанесла 5 урона по линии" : "Волна никого не задела";
-                    attacker.cooldownE = 3;
+                    msg=hit?"Звуковая волна 5 урона по линии":"Никого не задело"; att.cdE=3;
                     break;
-                case 'darkness': // пожирание
-                    let victim = getUnitAt(targetX, targetY);
-                    if (victim && victim.owner !== attacker.owner) {
-                        let dmg = 6;
-                        victim.takeDamage(dmg);
-                        attacker.heal(dmg);
-                        msg = `Пожирание: ${dmg} урона, лечение ${dmg}`;
-                    } else msg = "Нет врага для пожирания";
-                    attacker.cooldownE = 3;
+                case 'darkness':
+                    let victim=getUnit(tx,ty);
+                    if(victim && victim.owner!==att.owner){ let dmg=6; victim.takeDamage(dmg); att.heal(dmg); animateHit(tx,ty); animateDmg(tx,ty,dmg); if(!victim.alive) animateDeath(tx,ty); msg=`Пожирание: ${dmg} урона, лечение ${dmg}`; att.cdE=3; }
+                    else msg="Нет врага";
                     break;
-                default: msg = "Способность E не реализована";
             }
         }
         addLog(msg);
         return true;
     }
 
-    // Атака
-    function performAttack(attacker, targetX, targetY) {
-        if (attacker.stunned) { addLog(`${ARCH[attacker.archetype].name} оглушён!`); return false; }
-        let attackerPos = state.selectedCellPos;
-        if (!attackerPos) return false;
-        let target = getUnitAt(targetX, targetY);
-        if (!target || target.owner === attacker.owner) return false;
-        if (!isValidAttackRange(attacker, targetX, targetY, attackerPos.x, attackerPos.y)) {
-            addLog("Цель вне радиуса атаки");
-            return false;
-        }
-        let forced = getForcedTarget(attacker, attackerPos.x, attackerPos.y);
-        if (forced && forced !== target) { addLog("Вы обязаны атаковать ближайшего врага!"); return false; }
-        let dmg = attacker.attack + attacker.buffAttack;
-        let finalDmg = target.takeDamage(dmg);
-        addLog(`${ARCH[attacker.archetype].name} атакует ${ARCH[target.archetype].name} на ${finalDmg} урона`);
-        if (attacker.role === 'vampire') {
-            let healAmt = Math.floor(finalDmg * 0.5);
-            attacker.heal(healAmt);
-            addLog(`${ARCH[attacker.archetype].name} восстанавливает ${healAmt} HP`);
-        }
-        return true;
-    }
-
-    // Проверка смерти и стен/ловушек
-    function checkDeathAndSync() {
-        for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-            let u = getUnitAt(i,j);
-            if (u && !u.alive) {
-                if (u.owner === 'p1') state.players.p1.placementMap[i][j] = null;
-                else state.players.p2.placementMap[i][j] = null;
-            }
-        }
-        state.battleUnits.walls = state.battleUnits.walls.filter(w => w.hp > 0);
-        // проверка победы
-        let p1Alive = state.battleUnits.p1Units.some(u => u.alive);
-        let p2Alive = state.battleUnits.p2Units.some(u => u.alive);
-        let p1KingAlive = state.battleUnits.p1King && state.battleUnits.p1King.alive;
-        let p2KingAlive = state.battleUnits.p2King && state.battleUnits.p2King.alive;
-        if ((!p1Alive || !p1KingAlive)) { addLog(`🏆 ${state.players.p2.nick} ПОБЕДИЛ!`); resetToLobby(); return; }
-        if ((!p2Alive || !p2KingAlive)) { addLog(`🏆 ${state.players.p1.nick} ПОБЕДИЛ!`); resetToLobby(); return; }
-        sendSync();
-    }
-
-    // ---------- МУЛЬТИПЛЕЕР ----------
-    function sendSync() { if (state.conn && state.conn.open) state.conn.send({ type: "sync", data: serializeState() }); }
-    function serializeState() {
-        return {
-            players: state.players,
-            turn: state.turn,
-            battleUnits: {
-                p1Units: state.battleUnits.p1Units.map(u => ({...u})),
-                p2Units: state.battleUnits.p2Units.map(u => ({...u})),
-                p1King: state.battleUnits.p1King ? {...state.battleUnits.p1King} : null,
-                p2King: state.battleUnits.p2King ? {...state.battleUnits.p2King} : null,
-                walls: state.battleUnits.walls,
-                traps: state.battleUnits.traps
-            }
-        };
-    }
-    function reviveUnit(data) { if (!data) return null; let u = new Unit(data.archetype, data.owner, 0); Object.assign(u, data); return u; }
-    function deserializeState(data) {
-        state.players = data.players;
-        state.turn = data.turn;
-        state.battleUnits.p1Units = data.battleUnits.p1Units.map(u => reviveUnit(u));
-        state.battleUnits.p2Units = data.battleUnits.p2Units.map(u => reviveUnit(u));
-        state.battleUnits.p1King = reviveUnit(data.battleUnits.p1King);
-        state.battleUnits.p2King = reviveUnit(data.battleUnits.p2King);
-        state.battleUnits.walls = data.battleUnits.walls;
-        state.battleUnits.traps = data.battleUnits.traps;
-    }
-
-    function applyRemoteAction(action) {
-        if (state.turn !== (state.myPlayerId === 'p1' ? 'p2' : 'p1')) return;
-        let attacker = getUnitAt(action.attackerX, action.attackerY);
-        if (!attacker) return;
-        state.selectedCellPos = { x: action.attackerX, y: action.attackerY };
-        if (action.type === "attack") {
-            performAttack(attacker, action.targetX, action.targetY);
-        } else if (action.type === "skill") {
-            useAbility(attacker, action.targetX, action.targetY, action.slot);
-        }
-        state.selectedCellPos = null;
-        checkDeathAndSync();
-        state.turn = (state.turn === 'p1') ? 'p2' : 'p1';
-        sendSync();
+    function useKingAbility() {
+        let king = (state.turn==='p1')?state.battle.p1King:state.battle.p2King;
+        if(!king) return;
+        let act = KING_ACT[king.arch];
+        addLog(`Король использует: ${act}`);
+        if(act==="2 ловушки") for(let i=0;i<2;i++){ let free=[]; for(let a=0;a<5;a++) for(let b=0;b<5;b++) if(isWalkable(a,b)) free.push({x:a,y:b}); if(free.length){ let p=free[Math.floor(Math.random()*free.length)]; state.battle.traps.push(new Trap(p.x,p.y)); } }
+        else if(act==="щит +5 всем"){ let team=(state.turn==='p1')?state.battle.p1Units:state.battle.p2Units; team.forEach(u=>u.shield+=5); }
+        else if(act==="полный хил"){ let team=(state.turn==='p1')?state.battle.p1Units:state.battle.p2Units; let worst=team.reduce((a,b)=>a.hp/a.maxHp<b.hp/b.maxHp?a:b,team[0]); if(worst) worst.heal(worst.maxHp-worst.hp); }
+        else if(act==="+2 атаки команде"){ let team=(state.turn==='p1')?state.battle.p1Units:state.battle.p2Units; team.forEach(u=>u.buffAtk+=2); }
+        else if(act==="воскрешение 50%"){ let dead=(state.turn==='p1')?state.battle.p1Units.filter(u=>!u.alive):state.battle.p2Units.filter(u=>!u.alive); if(dead.length){ let rev=dead[0]; rev.alive=true; rev.hp=Math.floor(rev.maxHp*0.5); addLog(`${ARCH[rev.arch].name} воскрешён с 50% HP`); } }
         renderBattle();
     }
 
-    // ---------- ОТРИСОВКА ЭТАПОВ (сокращённо, но полнофункционально) ----------
+    function endTurn() {
+        state.battle.p1Units.forEach(u=>u.reduceCD()); state.battle.p2Units.forEach(u=>u.reduceCD());
+        state.turn = (state.turn==='p1')?'p2':'p1';
+        addLog(`Ход переходит к ${state.turn==='p1'?state.p1.nick:state.p2.nick}`);
+        sendSync();
+        renderBattle();
+        if(state.botMode && state.turn==='p2') setTimeout(()=>botTurn(), 400);
+    }
+
+    function checkWin() {
+        let p1u=state.battle.p1Units.some(u=>u.alive), p2u=state.battle.p2Units.some(u=>u.alive);
+        let p1k=state.battle.p1King?.alive, p2k=state.battle.p2King?.alive;
+        if(!p1u || !p1k){ addLog(`${state.p2.nick} ПОБЕДА!`); resetGame(); return true; }
+        if(!p2u || !p2k){ addLog(`${state.p1.nick} ПОБЕДА!`); resetGame(); return true; }
+        return false;
+    }
+
+    function botTurn() {
+        if(state.turn!=='p2') return;
+        let units=state.battle.p2Units.filter(u=>u.alive);
+        for(let u of units){
+            let pos=findPos(u); if(!pos) continue;
+            let enemies=state.battle.p1Units.filter(e=>e.alive);
+            if(enemies.length===0) continue;
+            let target=enemies.reduce((a,b)=>{ let pa=findPos(a), pb=findPos(b); return dist(pos.x,pos.y,pa.x,pa.y)<dist(pos.x,pos.y,pb.x,pb.y)?a:b; });
+            let tpos=findPos(target);
+            if(canAttack(u,tpos.x,tpos.y,pos.x,pos.y)){ performAttack(u,tpos.x,tpos.y); if(checkWin()) return; continue; }
+            if(Math.random()<0.3){ useSkill(u,tpos.x,tpos.y,"Q"); if(checkWin()) return; continue; }
+            let dx=Math.sign(tpos.x-pos.x), dy=Math.sign(tpos.y-pos.y);
+            let nx=pos.x+dx, ny=pos.y+dy;
+            if(isWalkable(nx,ny)){ state.p2.map[pos.x][pos.y]=null; state.p2.map[nx][ny]=u; let trap=getTrap(nx,ny); if(trap && trap.owner!=='p2') trap.activate(u); renderBattle(); }
+        }
+        endTurn();
+    }
+
+    // ========== СИНХРОНИЗАЦИЯ ==========
+    function sendSync() { if(state.conn?.open) state.conn.send({type:"sync", data:serialize()}); }
+    function serialize() { return { p1:state.p1, p2:state.p2, turn:state.turn, battle:{ p1Units:state.battle.p1Units.map(u=>({...u})), p2Units:state.battle.p2Units.map(u=>({...u})), p1King:state.battle.p1King?{...state.battle.p1King}:null, p2King:state.battle.p2King?{...state.battle.p2King}:null, walls:state.battle.walls, traps:state.battle.traps } }; }
+    function reviveUnit(d) { if(!d) return null; let u=new Unit(d.arch, d.owner, d.id); Object.assign(u,d); return u; }
+    function deserialize(data) { state.p1=data.p1; state.p2=data.p2; state.turn=data.turn; state.battle.p1Units=data.battle.p1Units.map(u=>reviveUnit(u)); state.battle.p2Units=data.battle.p2Units.map(u=>reviveUnit(u)); state.battle.p1King=reviveUnit(data.battle.p1King); state.battle.p2King=reviveUnit(data.battle.p2King); state.battle.walls=data.battle.walls; state.battle.traps=data.battle.traps; }
+    function applyAction(act) { if(state.turn!==(state.myId==='p1'?'p2':'p1')) return; let attacker=getUnit(act.ax,act.ay); if(!attacker) return; state.selectedCell={x:act.ax,y:act.ay}; if(act.type==='attack') performAttack(attacker,act.tx,act.ty); else if(act.type==='skill') useSkill(attacker,act.tx,act.ty,act.slot); else if(act.type==='king') useKingAbility(); state.selectedCell=null; if(checkWin()) return; state.turn=(state.turn==='p1')?'p2':'p1'; sendSync(); renderBattle(); }
+
+    // ========== ОТРИСОВКА ЭТАПОВ ==========
     function render() {
-        if (state.phase === "lobby") renderLobby();
-        else if (state.phase === "pickCards") renderPickCards();
-        else if (state.phase === "placement") renderPlacement();
-        else if (state.phase === "battle") renderBattle();
+        if(state.phase==="lobby") renderLobby();
+        else if(state.phase==="pick") renderPick();
+        else if(state.phase==="placement") renderPlacement();
+        else if(state.phase==="battle") renderBattle();
+        updateAbilityIndicators();
     }
-
-    function renderLobby() { /* стандартное лобби с созданием/подключением */ 
-        root.innerHTML = `<div class="debug-panel"><span>🎮 КАРТОЧНАЯ ВОЙНА</span></div>
-        <input id="nick" placeholder="Ваш ник"><br>
-        <button id="create">✨ СОЗДАТЬ КОМНАТУ</button>
-        <input id="roomId" placeholder="ID комнаты"><button id="join">🔗 ПОДКЛЮЧИТЬСЯ</button>
-        <div class="log-area" id="debugLog"></div>`;
-        document.getElementById("create")?.addEventListener("click", () => { let nick = document.getElementById("nick").value.trim(); if(!nick) return; state.myNick = nick; let peer = new Peer(); peer.on("open", id => { state.peer = peer; state.roomId = id; addLog(`Комната создана: ${id}`); peer.on("connection", conn => { setupConnection(conn, true); }); }); });
-        document.getElementById("join")?.addEventListener("click", () => { let nick = document.getElementById("nick").value.trim(); let rid = document.getElementById("roomId").value.trim(); if(!nick || !rid) return; state.myNick = nick; let peer = new Peer(); peer.on("open", () => { let conn = peer.connect(rid); setupConnection(conn, false); }); });
-    }
-
-    function setupConnection(conn, isHost) {
-        state.conn = conn;
-        state.myPlayerId = isHost ? "p1" : "p2";
-        state.players[state.myPlayerId].nick = state.myNick;
-        conn.on("open", () => { state.phase = "pickCards"; render(); });
-        conn.on("data", (data) => {
-            if (data.type === "sync") deserializeState(data.data);
-            else if (data.type === "action") applyRemoteAction(data.action);
-            else if (data.type === "log") addLog(data.msg, false);
-            else if (data.type === "ready") { state.players[data.playerId].ready = true; if (state.players.p1.ready && state.players.p2.ready) startPlacementPhase(); }
-            else if (data.type === "placement") { state.players[data.playerId].placementMap = data.map; if (bothPlacementReady()) startBattle(); }
-            render();
-        });
-        if (!isHost) conn.send({ type: "init", nick: state.myNick });
-    }
-
-    function startPlacementPhase() { state.phase = "placement"; render(); }
-    function bothPlacementReady() { return state.players.p1.placementMap.flat().some(u=>u) && state.players.p2.placementMap.flat().some(u=>u); }
-    function startBattle() {
-        state.battleUnits.p1Units = state.players.p1.placementMap.flat().filter(u=>u);
-        state.battleUnits.p2Units = state.players.p2.placementMap.flat().filter(u=>u);
-        state.battleUnits.p1King = new Unit(state.players.p1.king.archetype, "p1", "king");
-        state.battleUnits.p2King = new Unit(state.players.p2.king.archetype, "p2", "king");
-        state.battleUnits.p1King.hp = 40; state.battleUnits.p1King.baseHp = 40;
-        state.battleUnits.p2King.hp = 40; state.battleUnits.p2King.baseHp = 40;
-        state.turn = "p1";
-        state.phase = "battle";
-        render();
-    }
-
-    function renderPickCards() { /* выбор короля и бойцов */ root.innerHTML = `<div><h2>Выберите короля</h2><div id="kingGrid"></div><h2>Выберите 3 бойцов</h2><div id="fighterGrid"></div><button id="readyBtn">Готов</button><div class="log-area" id="debugLog"></div></div>`;
-        let kingDiv = document.getElementById("kingGrid"); let fighterDiv = document.getElementById("fighterGrid");
-        for (let key of Object.keys(ARCH)) {
-            let card = document.createElement("div"); card.className = "hero-card"; if (state.players[state.myPlayerId].king?.archetype === key) card.classList.add("selected");
-            card.innerHTML = `<img src="${ARCH[key].img}"><div class="hero-name">👑 ${ARCH[key].name}</div><div class="hero-desc">${KING_PASSIVES[key].desc}</div>`;
-            card.onclick = () => { state.players[state.myPlayerId].king = { archetype: key, ...KING_PASSIVES[key] }; renderPickCards(); };
-            kingDiv.appendChild(card);
-            let fcard = document.createElement("div"); fcard.className = "hero-card"; if (state.players[state.myPlayerId].fighters.some(f=>f.archetype===key)) fcard.classList.add("selected");
-            fcard.innerHTML = `<img src="${ARCH[key].img}"><div class="hero-name">${ARCH[key].name}</div><div class="hero-desc">❤️${ARCH[key].hp} ⚔️${ARCH[key].attack}<br>${ARCH[key].skillQ} / ${ARCH[key].skillE}</div>`;
-            fcard.onclick = () => { let arr = state.players[state.myPlayerId].fighters; if (arr.some(f=>f.archetype===key)) arr = arr.filter(f=>f.archetype!==key); else if (arr.length<3) arr.push({ archetype: key, ...ARCH[key] }); state.players[state.myPlayerId].fighters = arr; renderPickCards(); };
-            fighterDiv.appendChild(fcard);
+    function updateAbilityIndicators() {
+        let divs=document.getElementById("abilityIndicators");
+        if(state.phase==="battle" && state.selectedCell){
+            let attacker=getUnit(state.selectedCell.x,state.selectedCell.y);
+            if(attacker && attacker.alive){
+                divs.style.display="flex";
+                let qCircle=document.getElementById("indicatorQ");
+                let eCircle=document.getElementById("indicatorE");
+                let cdQdiv=document.getElementById("cdQ");
+                let cdEdiv=document.getElementById("cdE");
+                if(attacker.cdQ===0){ qCircle.classList.add("ready"); qCircle.classList.remove("cooldown"); cdQdiv.innerText="✓"; } else { qCircle.classList.remove("ready"); qCircle.classList.add("cooldown"); cdQdiv.innerText=attacker.cdQ; }
+                if(attacker.cdE===0){ eCircle.classList.add("ready"); eCircle.classList.remove("cooldown"); cdEdiv.innerText="✓"; } else { eCircle.classList.remove("ready"); eCircle.classList.add("cooldown"); cdEdiv.innerText=attacker.cdE; }
+                return;
+            }
         }
-        document.getElementById("readyBtn")?.addEventListener("click", () => { if (!state.players[state.myPlayerId].king || state.players[state.myPlayerId].fighters.length!==3) return; state.players[state.myPlayerId].ready = true; state.conn.send({ type: "ready", playerId: state.myPlayerId }); if (state.players.p1.ready && state.players.p2.ready) startPlacementPhase(); });
+        divs.style.display="none";
     }
 
-    function renderPlacement() { let myMap = state.players[state.myPlayerId].placementMap; let isP1 = state.myPlayerId === 'p1'; let rows = isP1 ? [0,1] : [3,4]; root.innerHTML = `<div class="field-grid" id="placementGrid"></div><button id="donePlace">Готово</button><div class="log-area" id="debugLog"></div>`;
-        let grid = document.getElementById("placementGrid");
-        for (let i=0;i<5;i++) for(let j=0;j<5;j++) { let cell = document.createElement("div"); cell.className = "cell"; let unit = myMap[i][j]; if (unit) cell.innerHTML = `${ARCH[unit.archetype].name}<br>❤️${unit.hp}`; else cell.innerHTML = "⬚"; if (rows.includes(i) && !unit) cell.onclick = () => { let toPlace = state.players[state.myPlayerId].fighters.find(f => !myMap.flat().some(cell => cell === f)); if (toPlace) { myMap[i][j] = new Unit(toPlace.archetype, state.myPlayerId, "fighter"); renderPlacement(); } }; grid.appendChild(cell); }
-        document.getElementById("donePlace")?.addEventListener("click", () => { if (myMap.flat().filter(u=>u).length === 3) { state.conn.send({ type: "placement", playerId: state.myPlayerId, map: myMap }); if (bothPlacementReady()) startBattle(); } else addLog("Разместите 3 бойцов в своей зоне"); });
-    }
-
-    function renderBattle() { let isMyTurn = (state.turn === state.myPlayerId); let gridHtml = `<div class="turn-indicator">${isMyTurn ? "ВАШ ХОД" : "ХОД СОПЕРНИКА"}</div><div class="king-panel"><span>👑 ${state.players.p1.nick}: ❤️ ${state.battleUnits.p1King?.hp||0}</span><span>👑 ${state.players.p2.nick}: ❤️ ${state.battleUnits.p2King?.hp||0}</span></div><div class="field-grid" id="battleGrid"></div><div id="actionPanel" class="action-bar"></div><div class="log-area" id="debugLog"></div>`;
-        root.innerHTML = gridHtml;
-        let gridDiv = document.getElementById("battleGrid");
-        for (let i=0;i<5;i++) for(let j=0;j<5;j++) {
-            let cell = document.createElement("div"); cell.className = "cell"; let unit = getUnitAt(i,j); let wall = getWallAt(i,j); let trap = getTrapAt(i,j);
-            if (unit) { cell.classList.add(`owner-${unit.owner === 'p1' ? 0 : 1}`); cell.innerHTML = `${ARCH[unit.archetype].name}<br>❤️${unit.hp}`; if (unit.stunned) cell.innerHTML += "<br>💫"; }
-            else if (wall) { cell.classList.add("wall-cell"); cell.innerHTML = `🧱${wall.hp}`; }
-            else if (trap && trap.owner !== state.myPlayerId) cell.innerHTML = "⚠️";
-            else cell.innerHTML = "⬚";
-            if (state.selectedCellPos && state.selectedCellPos.x === i && state.selectedCellPos.y === j) cell.classList.add("selected-unit");
-            if (state.targetCellPos && state.targetCellPos.x === i && state.targetCellPos.y === j) cell.classList.add("target-highlight");
-            cell.onclick = () => { if (!isMyTurn) return; let u = getUnitAt(i,j); if (u && u.owner === state.myPlayerId) { state.selectedCellPos = {x:i,y:j}; state.targetCellPos = null; renderBattle(); } else if (state.selectedCellPos) { state.targetCellPos = {x:i,y:j}; renderBattle(); } };
-            gridDiv.appendChild(cell);
-        }
-        let actionDiv = document.getElementById("actionPanel");
-        if (isMyTurn && state.selectedCellPos) {
-            let attacker = getUnitAt(state.selectedCellPos.x, state.selectedCellPos.y);
-            if (attacker && attacker.alive && !attacker.stunned) {
-                actionDiv.innerHTML = `<button id="attackBtn">⚔️ АТАКА</button><button id="skillQBtn" class="skill-btn ${attacker.cooldownQ>0?'cooldown':''}" ${attacker.cooldownQ>0?`data-cd="${attacker.cooldownQ}"`:''}>🔮 Q: ${ARCH[attacker.archetype].skillQ}</button><button id="skillEBtn" class="skill-btn ${attacker.cooldownE>0?'cooldown':''}" ${attacker.cooldownE>0?`data-cd="${attacker.cooldownE}"`:''}>🎧 E: ${ARCH[attacker.archetype].skillE}</button><button id="endTurnBtn">⏭️ ЗАВЕРШИТЬ ХОД</button>`;
-                document.getElementById("attackBtn")?.addEventListener("click", () => { if (state.targetCellPos) { let success = performAttack(attacker, state.targetCellPos.x, state.targetCellPos.y); if (success) { state.conn.send({ type: "action", action: { type:"attack", attackerX:state.selectedCellPos.x, attackerY:state.selectedCellPos.y, targetX:state.targetCellPos.x, targetY:state.targetCellPos.y } }); checkDeathAndSync(); state.selectedCellPos = null; state.targetCellPos = null; renderBattle(); } } });
-                document.getElementById("skillQBtn")?.addEventListener("click", () => { if (state.targetCellPos) { let success = useAbility(attacker, state.targetCellPos.x, state.targetCellPos.y, "Q"); if (success) { state.conn.send({ type: "action", action: { type:"skill", slot:"Q", attackerX:state.selectedCellPos.x, attackerY:state.selectedCellPos.y, targetX:state.targetCellPos.x, targetY:state.targetCellPos.y } }); checkDeathAndSync(); state.selectedCellPos = null; state.targetCellPos = null; renderBattle(); } } });
-                document.getElementById("skillEBtn")?.addEventListener("click", () => { if (state.targetCellPos) { let success = useAbility(attacker, state.targetCellPos.x, state.targetCellPos.y, "E"); if (success) { state.conn.send({ type: "action", action: { type:"skill", slot:"E", attackerX:state.selectedCellPos.x, attackerY:state.selectedCellPos.y, targetX:state.targetCellPos.x, targetY:state.targetCellPos.y } }); checkDeathAndSync(); state.selectedCellPos = null; state.targetCellPos = null; renderBattle(); } } });
-                document.getElementById("endTurnBtn")?.addEventListener("click", () => { for (let u of state.battleUnits.p1Units) u.reduceCooldowns(); for (let u of state.battleUnits.p2Units) u.reduceCooldowns(); state.turn = (state.turn === 'p1') ? 'p2' : 'p1'; sendSync(); renderBattle(); });
-            } else actionDiv.innerHTML = `<span>Выберите живого неоглушённого бойца</span>`;
-        } else if (isMyTurn && !state.selectedCellPos) actionDiv.innerHTML = `<span>Кликните по своему бойцу</span>`;
+    function renderLobby() {
+        root.innerHTML=`<div class="panel"><h1>⚔️ MINECRAFT KING'S BRAWL</h1><div style="text-align:center"><input id="nick" placeholder="Ваш ник"><br><button id="createRoom">🌟 Создать комнату</button><input id="roomId" placeholder="ID комнаты"><button id="joinRoom">🔗 Подключиться</button><button id="botBtn">🤖 Играть с ботом</button></div><div class="log-area" id="logArea"></div></div>`;
+        document.getElementById("createRoom")?.addEventListener("click",()=>{ let n=document.getElementById("nick").value.trim(); if(!n) return; state.myNick=n; let p=new Peer(); p.on("open",id=>{ state.peer=p; state.roomId=id; addLog(`Комната создана: ${id}`); p.on("connection",c=>setupConnection(c,true)); }); });
+        document.getElementById("joinRoom")?.addEventListener("click",()=>{ let n=document.getElementById("nick").value.trim(); let rid=document.getElementById("roomId").value.trim(); if(!n||!rid) return; state.myNick=n; let p=new Peer(); p.on("open",()=>{ let c=p.connect(rid); setupConnection(c,false); }); });
+        document.getElementById("botBtn")?.addEventListener("click",()=>{ let n=document.getElementById("nick").value.trim(); if(!n) return; state.myNick=n; state.myId="p1"; state.p1.nick=n; state.p2.nick="Bot"; state.botMode=true; state.phase="pick"; render(); });
         renderLog();
     }
-
-    function resetToLobby() { state.phase = "lobby"; state.players.p1.ready = false; state.players.p2.ready = false; state.players.p1.placementMap = Array(5).fill().map(()=>Array(5).fill(null)); state.players.p2.placementMap = Array(5).fill().map(()=>Array(5).fill(null)); state.battleUnits = { p1Units:[], p2Units:[], p1King:null, p2King:null, walls:[], traps:[] }; render(); }
-
+    function setupConnection(conn, isHost) { state.conn=conn; state.myId=isHost?"p1":"p2"; state[state.myId].nick=state.myNick; conn.on("open",()=>{ state.phase="pick"; render(); }); conn.on("data",(d)=>{ if(d.type==="sync") deserialize(d.data); else if(d.type==="action") applyAction(d.action); else if(d.type==="log") addLog(d.msg); else if(d.type==="ready"){ state[d.playerId].ready=true; if(state.p1.ready && state.p2.ready) startPlacement(); } else if(d.type==="placement"){ state[d.playerId].map=d.map; if(bothPlaced()) startBattle(); } }); conn.on("close",()=>{ addLog("Потеря связи"); resetGame(); }); if(!isHost) conn.send({type:"init", nick:state.myNick}); }
+    function startPlacement(){ state.phase="placement"; render(); }
+    function bothPlaced(){ return state.p1.map.flat().some(u=>u) && state.p2.map.flat().some(u=>u); }
+    function startBattle(){
+        state.battle.p1Units=state.p1.map.flat().filter(u=>u);
+        state.battle.p2Units=state.p2.map.flat().filter(u=>u);
+        state.battle.p1King=new Unit(state.p1.king.arch,"p1","king"); state.battle.p1King.maxHp=40; state.battle.p1King.hp=40;
+        state.battle.p2King=new Unit(state.p2.king.arch,"p2","king"); state.battle.p2King.maxHp=40; state.battle.p2King.hp=40;
+        state.turn="p1"; state.phase="battle"; render(); if(state.botMode && state.turn==='p2') setTimeout(()=>botTurn(),300);
+    }
+    function renderPick() {
+        let my=state[state.myId];
+        root.innerHTML=`<div class="panel"><h2>Выбери КОРОЛЯ</h2><div id="kingGrid" class="card-grid"></div><h2>Выбери 3 бойцов</h2><div id="fightGrid" class="card-grid"></div><button id="readyPick">✅ ГОТОВ</button><div class="log-area" id="logArea"></div></div>`;
+        let kingDiv=document.getElementById("kingGrid"), fightDiv=document.getElementById("fightGrid");
+        for(let k of Object.keys(ARCH)){
+            let card=document.createElement("div"); card.className="hero-card"; if(my.king?.arch===k) card.classList.add("selected");
+            card.innerHTML=`<img src="${ARCH[k].img}"><div class="hero-name">👑 ${ARCH[k].name}</div><div class="hero-desc">Пассив: +${KING_PASS[k].atk} атаки, +${KING_PASS[k].hp} HP</div>`;
+            card.onclick=()=>{ my.king={arch:k, ...KING_PASS[k]}; renderPick(); };
+            kingDiv.appendChild(card);
+            let fcard=document.createElement("div"); fcard.className="hero-card"; if(my.fighters.some(f=>f.arch===k)) fcard.classList.add("selected");
+            fcard.innerHTML=`<img src="${ARCH[k].img}"><div class="hero-name">${ARCH[k].name}</div><div class="hero-desc">❤️${ARCH[k].hp} ⚔️${ARCH[k].atk}<br>🎯${ARCH[k].q} / ${ARCH[k].e}</div>`;
+            fcard.onclick=()=>{ let arr=my.fighters; if(arr.some(f=>f.arch===k)) arr=arr.filter(f=>f.arch!==k); else if(arr.length<3) arr.push({arch:k}); my.fighters=arr; renderPick(); };
+            fightDiv.appendChild(fcard);
+        }
+        document.getElementById("readyPick")?.addEventListener("click",()=>{ if(!my.king || my.fighters.length!==3) return; my.ready=true; if(state.conn) state.conn.send({type:"ready", playerId:state.myId}); if(state.botMode || (state.p1.ready && state.p2.ready)) startPlacement(); });
+        renderLog();
+    }
+    function renderPlacement() {
+        let myMap=state[state.myId].map;
+        let isP1=state.myId==='p1';
+        let rows=isP1?[0,1]:[3,4];
+        root.innerHTML=`<div class="panel"><div class="field-grid" id="placeGrid"></div><button id="donePlace">✅ РАССТАВИТЬ</button><div class="log-area" id="logArea"></div></div>`;
+        let grid=document.getElementById("placeGrid");
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++){
+            let cell=document.createElement("div"); cell.className="cell"; let unit=myMap[i][j];
+            if(unit) cell.innerHTML=`${ARCH[unit.arch].name}<br>❤️${unit.hp}`; else cell.innerHTML=".";
+            if(rows.includes(i) && !unit) cell.onclick=()=>{
+                let toPlaceArch = state[state.myId].fighters.find(f => !myMap.flat().some(cell => cell && cell.arch===f.arch));
+                if(toPlaceArch){
+                    let newUnit = new Unit(toPlaceArch.arch, state.myId, "fighter");
+                    myMap[i][j] = newUnit;
+                    renderPlacement();
+                } else addLog("Нет неразмещённых бойцов");
+            };
+            grid.appendChild(cell);
+        }
+        document.getElementById("donePlace")?.addEventListener("click",()=>{ if(myMap.flat().filter(u=>u).length===3){ if(state.conn) state.conn.send({type:"placement", playerId:state.myId, map:myMap}); if(bothPlaced() || state.botMode) startBattle(); } else addLog("Нужно разместить 3 бойцов в своей зоне"); });
+        renderLog();
+    }
+    function renderBattle() {
+        let isMyTurn=(state.turn===state.myId) || (state.botMode && state.turn==='p1');
+        root.innerHTML=`<div class="panel"><div class="turn-indicator">${isMyTurn?"⚡ ВАШ ХОД":"⏳ ХОД СОПЕРНИКА"}</div><div class="king-panel"><span>👑 ${state.p1.nick}: ❤️ ${state.battle.p1King?.hp||0}</span><span>👑 ${state.p2.nick}: ❤️ ${state.battle.p2King?.hp||0}</span></div><div class="field-grid" id="battleGrid"></div><div id="actionPanel" class="action-bar"></div><div class="log-area" id="logArea"></div></div>`;
+        let grid=document.getElementById("battleGrid");
+        for(let i=0;i<5;i++) for(let j=0;j<5;j++){
+            let cell=document.createElement("div"); cell.className="cell"; let u=getUnit(i,j); let w=getWall(i,j); let t=getTrap(i,j);
+            if(u){ cell.classList.add(`owner-${u.owner}`); cell.innerHTML=`${ARCH[u.arch].name}<br>❤️${u.hp}`; if(u.stunned) cell.innerHTML+="<br>💫"; }
+            else if(w){ cell.classList.add("wall"); cell.innerHTML=`🧱${w.hp}`; }
+            else if(t && t.owner!==state.myId) cell.innerHTML="⚠️";
+            else cell.innerHTML=".";
+            if(state.selectedCell?.x===i && state.selectedCell?.y===j) cell.classList.add("selected-unit");
+            if(state.targetCell?.x===i && state.targetCell?.y===j) cell.classList.add("target-highlight");
+            cell.onclick=()=>{ if(!isMyTurn) return; let unit=getUnit(i,j); if(unit && unit.owner===state.myId){ state.selectedCell={x:i,y:j}; state.targetCell=null; renderBattle(); } else if(state.selectedCell){ state.targetCell={x:i,y:j}; renderBattle(); } };
+            grid.appendChild(cell);
+        }
+        let actDiv=document.getElementById("actionPanel");
+        if(isMyTurn && state.selectedCell){
+            let attacker=getUnit(state.selectedCell.x,state.selectedCell.y);
+            if(attacker && attacker.alive && !attacker.stunned){
+                actDiv.innerHTML=`<button id="atkBtn">⚔️ АТАКА</button><button id="qBtn">🔮 Q (${ARCH[attacker.arch].q})</button><button id="eBtn">🎧 E (${ARCH[attacker.arch].e})</button><button id="kingActBtn">👑 КОРОЛЬ</button><button id="endBtn">⏩ ЗАВЕРШИТЬ ХОД</button>`;
+                document.getElementById("atkBtn")?.addEventListener("click",()=>{ if(state.targetCell){ performAttack(attacker,state.targetCell.x,state.targetCell.y); if(state.conn) state.conn.send({type:"action",action:{type:"attack",ax:state.selectedCell.x,ay:state.selectedCell.y,tx:state.targetCell.x,ty:state.targetCell.y}}); if(checkWin()) return; state.selectedCell=null; state.targetCell=null; renderBattle(); } });
+                document.getElementById("qBtn")?.addEventListener("click",()=>{ if(state.targetCell){ useSkill(attacker,state.targetCell.x,state.targetCell.y,"Q"); if(state.conn) state.conn.send({type:"action",action:{type:"skill",slot:"Q",ax:state.selectedCell.x,ay:state.selectedCell.y,tx:state.targetCell.x,ty:state.targetCell.y}}); if(checkWin()) return; state.selectedCell=null; state.targetCell=null; renderBattle(); } });
+                document.getElementById("eBtn")?.addEventListener("click",()=>{ if(state.targetCell){ useSkill(attacker,state.targetCell.x,state.targetCell.y,"E"); if(state.conn) state.conn.send({type:"action",action:{type:"skill",slot:"E",ax:state.selectedCell.x,ay:state.selectedCell.y,tx:state.targetCell.x,ty:state.targetCell.y}}); if(checkWin()) return; state.selectedCell=null; state.targetCell=null; renderBattle(); } });
+                document.getElementById("kingActBtn")?.addEventListener("click",()=>{ useKingAbility(); if(state.conn) state.conn.send({type:"action",action:{type:"king"}}); renderBattle(); });
+                document.getElementById("endBtn")?.addEventListener("click",()=>{ endTurn(); });
+            } else actDiv.innerHTML=`<span>⚠️ Боец оглушён или мёртв</span>`;
+        } else if(isMyTurn && !state.selectedCell) actDiv.innerHTML=`<span>🔍 Кликни по своему бойцу</span>`;
+        renderLog();
+        updateAbilityIndicators();
+    }
+    function resetGame() { state.phase="lobby"; state.p1={ nick:"", king:null, fighters:[], ready:false, map:Array(5).fill().map(()=>Array(5).fill(null)) }; state.p2={...state.p1}; state.battle={p1Units:[],p2Units:[],p1King:null,p2King:null,walls:[],traps:[]}; state.selectedCell=null; state.targetCell=null; state.botMode=false; if(state.conn){ state.conn.close(); state.conn=null; } render(); }
     render();
 </script>
 </body>
