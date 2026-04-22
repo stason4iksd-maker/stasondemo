@@ -116,6 +116,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .conn-status{font-size:.6rem;text-align:center;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--text-dim)}
 .conn-status.ok{color:var(--green2);border-color:var(--green)}
 .conn-status.err{color:var(--red2);border-color:var(--red)}
+.room-id-box{background:#08090f;border:1px solid var(--accent);border-radius:3px;padding:10px 14px;text-align:center;display:none}
+.room-id-label{font-size:.6rem;color:var(--text-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.room-id-val{font-family:'Courier New',monospace;font-size:1.1rem;color:var(--accent2);letter-spacing:.15em;word-break:break-all;cursor:pointer}
+.room-id-hint{font-size:.6rem;color:var(--text-dim);margin-top:5px}
 </style>
 </head>
 <body>
@@ -979,6 +983,32 @@ function render(){
   else if(S.phase==='battle')renderBattle();
 }
 
+// --- ICE / PEER CONFIG ---
+// Используем несколько публичных STUN-серверов для надёжности
+const PEER_CONFIG = {
+  config:{
+    iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'},
+      {urls:'stun:stun2.l.google.com:19302'},
+      {urls:'stun:stun.stunprotocol.org:3478'},
+      {urls:'stun:stun.cloudflare.com:3478'}
+    ]
+  }
+};
+
+function makePeer(id){
+  // id — конкретный ID (для хоста генерируем короткий, для гостя не нужен)
+  return id ? new Peer(id, PEER_CONFIG) : new Peer(PEER_CONFIG);
+}
+
+// Генерируем короткий читаемый ID для хоста
+function genRoomId(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let id='';for(let i=0;i<6;i++)id+=chars[Math.floor(Math.random()*chars.length)];
+  return 'PYV-'+id;
+}
+
 // --- ЛОББИ ---
 function renderLobby(){
   document.body.style.overflow='hidden';
@@ -994,8 +1024,13 @@ function renderLobby(){
       <div class="row">
         <button class="btn gold" id="createBtn">⚔ СОЗДАТЬ КОМНАТУ</button>
       </div>
+      <div class="room-id-box" id="roomIdBox">
+        <div class="room-id-label">ID комнаты (нажми чтобы скопировать)</div>
+        <div class="room-id-val" id="roomIdVal">—</div>
+        <div class="room-id-hint">Скопируй и отправь другу</div>
+      </div>
       <div class="row">
-        <input class="inp" id="roomId" placeholder="ID комнаты" style="flex:1;width:auto;margin:0">
+        <input class="inp" id="roomIdInp" placeholder="ID комнаты (например PYV-AB3X7Z)" style="flex:1;width:auto;margin:0">
         <button class="btn" id="joinBtn" style="flex:0 0 auto">ВОЙТИ</button>
       </div>
       <div class="row">
@@ -1007,35 +1042,57 @@ function renderLobby(){
   </div>`;
 
   document.getElementById('createBtn').onclick=()=>{
-    let n=document.getElementById('nick').value.trim(); if(!n)return;
+    let n=document.getElementById('nick').value.trim(); if(!n){addLog('Введи ник!');return;}
     S.myNick=n;
     updateConnStatus('','Создаём комнату…');
-    let p=new Peer();
-    p.on('error',e=>{ addLog('Ошибка PeerJS: '+e.type); updateConnStatus('err',e.type); });
+    addLog('Подключаемся к серверу…');
+    let roomId=genRoomId();
+    let p=makePeer(roomId);
+    p.on('error',e=>{
+      let msg=e.type==='unavailable-id'?'ID занят, пробуем снова…':('Ошибка: '+e.type);
+      addLog('⚠ '+msg);
+      updateConnStatus('err',e.type);
+      // если ID занят — пробуем новый
+      if(e.type==='unavailable-id'){ p.destroy(); setTimeout(()=>document.getElementById('createBtn')?.click(),300); }
+    });
     p.on('open',id=>{
       S.peer=p;
-      addLog(`Комната: ${id} (скопируй и дай другу)`);
-      updateConnStatus('','Ждём соперника…');
+      addLog(`✅ Комната создана!`);
+      updateConnStatus('','⏳ Ждём соперника…');
+      let box=document.getElementById('roomIdBox');
+      let val=document.getElementById('roomIdVal');
+      if(box&&val){ box.style.display='block'; val.textContent=id; val.onclick=()=>{ navigator.clipboard?.writeText(id).then(()=>addLog('📋 ID скопирован!')).catch(()=>{}); }; }
       p.on('connection',conn=>{ setupPeer(true,conn); });
     });
   };
 
   document.getElementById('joinBtn').onclick=()=>{
-    let n=document.getElementById('nick').value.trim(), rid=document.getElementById('roomId').value.trim();
-    if(!n||!rid)return;
+    let n=document.getElementById('nick').value.trim(), rid=document.getElementById('roomIdInp').value.trim().toUpperCase();
+    if(!n){addLog('Введи ник!');return;}
+    if(!rid){addLog('Введи ID комнаты!');return;}
     S.myNick=n;
     updateConnStatus('','Подключаемся…');
-    let p=new Peer();
-    p.on('error',e=>{ addLog('Ошибка: '+e.type); updateConnStatus('err',e.type); });
+    addLog(`Подключаемся к комнате ${rid}…`);
+    let p=makePeer();
+    p.on('error',e=>{
+      let hint='';
+      if(e.type==='peer-unavailable') hint='Комната не найдена. Проверь ID — он должен быть вида PYV-XXXXXX';
+      else if(e.type==='network') hint='Нет сети или сервер недоступен';
+      else hint='Ошибка: '+e.type;
+      addLog('❌ '+hint);
+      updateConnStatus('err',e.type);
+    });
     p.on('open',()=>{
       S.peer=p;
+      addLog('Peer готов, соединяемся…');
       let c=p.connect(rid,{reliable:true,serialization:'json'});
+      c.on('error',e=>{ addLog('Ошибка соединения: '+(e.message||e.type)); updateConnStatus('err','conn error'); });
       setupPeer(false,c);
     });
   };
 
   document.getElementById('botBtn').onclick=()=>{
-    let n=document.getElementById('nick').value.trim(); if(!n)return;
+    let n=document.getElementById('nick').value.trim(); if(!n){addLog('Введи ник!');return;}
     S.myNick=n; S.myId='p1'; S.p1.nick=n; S.p2.nick='БОТ'; S.botMode=true; S.phase='pick'; render();
   };
 }
