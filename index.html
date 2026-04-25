@@ -113,6 +113,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .power-card-empty{opacity:.3;cursor:default}
 .power-card-empty:hover{transform:none;box-shadow:none;border-color:var(--border)}
 .status-icons{position:absolute;top:2px;left:2px;z-index:3;display:flex;flex-direction:column;gap:1px}
+.help-btn{position:fixed;bottom:18px;left:18px;z-index:9800;width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#1a1e2e,#0d1018);border:1px solid var(--accent);color:var(--accent2);font-family:'Cinzel',serif;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(200,168,75,.25);transition:all .2s}
+.help-btn:hover{box-shadow:0 0 24px rgba(200,168,75,.5);transform:scale(1.1)}
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s ease}
+.help-box{background:var(--panel);border:1px solid var(--border);border-radius:6px;max-width:520px;width:100%;padding:32px 36px;position:relative;box-shadow:0 0 80px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
+.help-box::before{content:'';position:absolute;top:-1px;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.help-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;transition:color .15s}
+.help-close:hover{color:var(--accent2)}
+.help-main{font-size:.8rem;color:var(--text);line-height:1.8;margin-bottom:20px}
+.help-discord{display:inline-block;margin-top:6px;color:var(--accent2);font-weight:700;letter-spacing:.05em}
+.help-sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:18px 0}
+.help-thanks-title{text-align:center;font-family:'Cinzel Decorative',serif;font-size:.9rem;letter-spacing:.15em;margin-bottom:16px}
+.shimmer-gold{background:linear-gradient(90deg,#c8a84b,#fff5c0,#c8a84b,#e8c96a,#c8a84b);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite}
+.shimmer-purple{background:linear-gradient(90deg,#8040c0,#d080ff,#a060e0,#c080ff,#8040c0);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite .5s}
+.shimmer-blue{background:linear-gradient(90deg,#3060c8,#60d0ff,#40a0e0,#80d0ff,#3060c8);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite 1s}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.help-person{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.help-person-name{font-size:.85rem;font-weight:700;font-family:'Cinzel',serif;letter-spacing:.08em}
+.help-person-role{font-size:.7rem;color:var(--text-dim);line-height:1.5}
 .conn-status{font-size:.6rem;text-align:center;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--text-dim)}
 .conn-status.ok{color:var(--green2);border-color:var(--green)}
 .conn-status.err{color:var(--red2);border-color:var(--red)}
@@ -124,6 +142,34 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </head>
 <body>
 <canvas id="fxCanvas" style="position:fixed;top:0;left:0;pointer-events:none;z-index:8000;width:100vw;height:100vh"></canvas>
+<button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="О проекте">?</button>
+
+<div class="help-overlay" id="helpOverlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="help-box">
+    <button class="help-close" onclick="document.getElementById('helpOverlay').style.display='none'">✕</button>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:1rem;text-align:center;margin-bottom:18px;background:linear-gradient(135deg,#c8a84b,#fff5c0,#c8a84b);-webkit-background-clip:text;-webkit-text-fill-color:transparent">О ПРОЕКТЕ</div>
+    <div class="help-main">
+      Благодарю всех, кто оказывает поддержку в процессе разработки игры. Я рад возможности продолжать её развитие. Планирую добавить новые карты и внести исправления в существующие, однако для этого мне необходима ваша помощь в выявлении ошибок и балансировке персонажей.
+      <br><br>
+      Прошу обращаться ко мне в Discord: <span class="help-discord">stason0537</span>
+    </div>
+    <div class="help-sep"></div>
+    <div class="help-thanks-title shimmer-gold">✦ ОТДЕЛЬНОЕ СПАСИБО ✦</div>
+    <div class="help-person">
+      <div class="help-person-name shimmer-gold">TVINKI98</div>
+      <div class="help-person-role">За поддержку в развитии проекта</div>
+    </div>
+    <div class="help-person">
+      <div class="help-person-name shimmer-purple">shadowcrys</div>
+      <div class="help-person-role">За то что он хороший друг</div>
+    </div>
+    <div class="help-person">
+      <div class="help-person-name shimmer-blue">MR Coldness</div>
+      <div class="help-person-role">За то что он Создатель такого прекрасного сообщества людей&nbsp;:)</div>
+    </div>
+  </div>
+</div>
+
 <div id="app"></div>
 <script>
 // ============================================================
