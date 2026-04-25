@@ -828,9 +828,6 @@ function sendState(){
   if(S.conn?.open) S.conn.send({type:'state',data:serialize()});
 }
 
-// --- Сообщение инициализации ---
-function sendInit(conn,nick){ conn.send({type:'init',nick}); }
-
 // --- Настройка соединения ---
 // isHost: true = p1 (создал), false = p2 (вошёл)
 function setupPeer(isHost, conn){
@@ -838,16 +835,23 @@ function setupPeer(isHost, conn){
   S[S.myId].nick = S.myNick;
   S.conn = conn;
 
-  conn.on('open',()=>{
-    addLog('✅ Соединение установлено');
-    updateConnStatus('ok','Подключено');
-    if(!isHost) sendInit(conn, S.myNick);
-    // хост ждёт init от гостя
-  });
-
+  // Навешиваем data ДО open — PeerJS буферизует события
   conn.on('data', msg => {
     try{ handleNetMsg(msg, isHost); }
     catch(e){ console.error('Net msg error',e); }
+  });
+
+  conn.on('open',()=>{
+    addLog('✅ Соединение установлено');
+    updateConnStatus('ok','Подключено');
+    if(isHost){
+      // Хост переходит в pick и ждёт init от гостя
+      S.phase='pick'; render();
+    } else {
+      // Гость представляется хосту и переходит в pick
+      conn.send({type:'init', nick:S.myNick});
+      S.phase='pick'; render();
+    }
   });
 
   conn.on('close',()=>{ addLog('❌ Соединение разорвано'); updateConnStatus('err','Разрыв'); });
@@ -857,11 +861,11 @@ function setupPeer(isHost, conn){
 function handleNetMsg(msg, isHost){
   switch(msg.type){
     case 'init':
-      // гость представился хосту
-      S[isHost?'p2':'p1'].nick = msg.nick;
+      // гость представился хосту — хост обновляет ник гостя
+      S['p2'].nick = msg.nick;
       addLog(`👤 ${msg.nick} подключился`);
-      // переходим к выбору
-      S.phase='pick'; render();
+      // хост уже в pick — просто перерисуем чтобы показать ник
+      if(S.phase==='pick') render();
       break;
 
     case 'pick_ready':
@@ -869,9 +873,10 @@ function handleNetMsg(msg, isHost){
       S[isHost?'p2':'p1'].king = msg.king;
       S[isHost?'p2':'p1'].fighters = msg.fighters;
       S[isHost?'p2':'p1'].ready = true;
-      addLog(`${msg.nick} готов`);
+      addLog(`✅ ${msg.nick} готов`);
+      // если я тоже уже готов — оба переходят в расстановку
       if(S.p1.ready && S.p2.ready) startPlacement();
-      else render();
+      else{ addLog('Ожидаем тебя…'); if(S.phase==='pick') renderPick(); }
       break;
 
     case 'placement_done':
@@ -1101,17 +1106,34 @@ function renderLobby(){
 function renderPick(){
   document.body.style.overflow='auto';
   let my=S[S.myId];
+  let opp=S[S.myId==='p1'?'p2':'p1'];
   let allKings=[...Object.keys(ARCH),...Object.keys(KING_ONLY)];
   let fighters=Object.keys(ARCH);
+  let iWaiting=my.ready && !S.botMode; // я нажал готов, жду соперника
+
+  // Статус соперника
+  let oppStatus = S.botMode ? '' :
+    opp.ready
+      ? `<div style="text-align:center;font-size:.7rem;color:var(--green2);padding:4px 0">✅ ${opp.nick||'Соперник'} готов</div>`
+      : `<div style="text-align:center;font-size:.7rem;color:var(--text-dim);padding:4px 0">⏳ Ожидаем ${opp.nick||'соперника'}…</div>`;
+
+  // Кнопка или статус ожидания
+  let readyArea = iWaiting
+    ? `<div style="display:flex;justify-content:center;margin:12px 0">
+         <div style="width:240px;max-width:90vw;text-align:center;padding:12px;border:1px solid var(--green);border-radius:3px;color:var(--green2);font-size:.8rem;letter-spacing:.05em">⏳ Ждём соперника…</div>
+       </div>`
+    : `<div style="display:flex;justify-content:center;margin:12px 0">
+         <button class="btn gold" id="readyBtn" style="width:240px;max-width:90vw">✔ ГОТОВ К БОЮ</button>
+       </div>`;
+
   root.innerHTML=`
   <div class="pick-wrap">
     <div class="section-title">ВЫБЕРИ КОРОЛЯ</div>
     <div id="kingGrid" class="card-grid"></div>
     <div class="section-title">ВЫБЕРИ 3 БОЙЦОВ — <span style="color:var(--accent2)">${my.fighters.length}/3</span></div>
     <div id="fightGrid" class="card-grid"></div>
-    <div style="display:flex;justify-content:center;margin:12px 0">
-      <button class="btn gold" id="readyBtn" style="width:240px;max-width:90vw">✔ ГОТОВ К БОЮ</button>
-    </div>
+    ${oppStatus}
+    ${readyArea}
     <div class="log-area" id="logArea"></div>
   </div>`;
 
@@ -1120,7 +1142,8 @@ function renderPick(){
     let data=ARCH[k]||KING_ONLY[k];
     let kc=document.createElement('div'); kc.className='hero-card'+(my.king?.arch===k?' selected':'');
     kc.innerHTML=`<img src="${data.img}" onerror="this.style.display='none'"><div class="hero-name">👑 ${data.name}</div><div class="hero-role">${data.role||'king'}</div><div class="hero-stats"><span class="hero-stat">ATK <span>+${KING_PASS[k]?.atk||0}</span></span><span class="hero-stat">HP <span>+${KING_PASS[k]?.hp||0}</span></span></div><div class="hero-skills" style="color:var(--accent);font-size:.58rem">${KING_ACT[k]||'Активка'}</div>`;
-    kc.onclick=()=>{ my.king={arch:k,...KING_PASS[k]}; renderPick(); };
+    // если уже нажал готов — нельзя менять
+    if(!iWaiting) kc.onclick=()=>{ my.king={arch:k,...KING_PASS[k]}; renderPick(); };
     kg.appendChild(kc);
   }
 
@@ -1129,7 +1152,7 @@ function renderPick(){
     let data=ARCH[k];
     let fc=document.createElement('div'); fc.className='hero-card'+(my.fighters.some(f=>f.arch===k)?' selected':'');
     fc.innerHTML=`<img src="${data.img}" onerror="this.style.display='none'"><div class="hero-name">${data.name}</div><div class="hero-role">${data.role}</div><div class="hero-stats"><span class="hero-stat">HP <span>${data.hp}</span></span><span class="hero-stat">⚔ <span>${data.atk}</span></span></div><div class="hero-skills">Q: ${data.q}<br>E: ${data.e}</div>`;
-    fc.onclick=()=>{
+    if(!iWaiting) fc.onclick=()=>{
       let arr=my.fighters;
       if(arr.some(f=>f.arch===k)) arr=arr.filter(f=>f.arch!==k);
       else if(arr.length<3) arr.push({arch:k});
@@ -1138,7 +1161,8 @@ function renderPick(){
     fg.appendChild(fc);
   }
 
-  document.getElementById('readyBtn').onclick=()=>{
+  let readyBtn=document.getElementById('readyBtn');
+  if(readyBtn) readyBtn.onclick=()=>{
     if(!my.king){addLog('Выбери короля!');return;}
     if(my.fighters.length!==3){addLog('Выбери 3 бойцов!');return;}
     my.ready=true;
@@ -1149,8 +1173,13 @@ function renderPick(){
       startPlacement();
     } else {
       sendPickReady();
-      addLog('Ожидаем соперника…');
-      render(); // перерисуем без кнопки готовности
+      // если соперник уже готов — сразу переходим
+      if(S.p1.ready && S.p2.ready){
+        startPlacement();
+      } else {
+        addLog('Ожидаем соперника…');
+        renderPick();
+      }
     }
   };
 }
